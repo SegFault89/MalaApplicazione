@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MalaApplicazione</string>
+    <string name="inserisci_disponibilita">Inserisci Disponibilità</string>
+    <string name="visualizza_disponibilita">Visualizza Disponibilità</string>
+    <string name="dati_fattura">Dati Fattura</string>
+    <string name="indietro">indietro</string>
+</resources>
