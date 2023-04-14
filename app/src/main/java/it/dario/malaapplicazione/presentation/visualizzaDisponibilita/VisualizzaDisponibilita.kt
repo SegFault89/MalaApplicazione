@@ -27,3 +27,4 @@ fun VisualizzaDisponibilita(navigateUp: ()-> Unit) {
         }
     }
 }
+
