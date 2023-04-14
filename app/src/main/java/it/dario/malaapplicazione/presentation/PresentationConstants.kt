@@ -8,4 +8,5 @@ object PresentationConstants {
     const val VISUALIZZA_DISPONIBILITA = "visualizza_disponibilita"
     const val DATI_FATTURA = "dati_fattura"
     //endregion
+
 }
