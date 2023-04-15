@@ -12,7 +12,7 @@ import java.time.Month
  * Implementazione per permettere di testare l'applicazione con dati mockati
  * senza contattattare ancora il foglio di presenze
  */
-class MockDataSource : IDisponibilitaDataSource{
+class MockDataSource : IDisponibilitaDataSource {
 
     //region dati fittizi
     private val malaFile = MalaFile(fogli = listOf("Ottobre'23", "Novembre'23"))
@@ -32,19 +32,55 @@ class MockDataSource : IDisponibilitaDataSource{
         meseInt = Month.NOVEMBER.value,
         annoInt = 2023,
         primoGiorno = LocalDate.of(2023, Month.NOVEMBER.value, 1),
-        ultimoGiorno = LocalDate.of(2023, Month.DECEMBER.value, 4) //il foglio novembre va fino al 4 dicembre perchè se no è facile
+        ultimoGiorno = LocalDate.of(
+            2023,
+            Month.DECEMBER.value,
+            4
+        ) //il foglio novembre va fino al 4 dicembre perchè se no è facile
     )
 
-    private val darioOttobre = Animatore (nome= "Dario", cognome = "Trisconi", domicilio = "Seregno", auto = false, adulti = true, bambini = false, note = "Datemidabbere")
-    private val darioNovembre = Animatore (nome= "Dario", cognome = "Trisconi", domicilio = "Seregno", auto = false, adulti = true, bambini = false, note = "Datemidabberedippiù")
+    private val darioOttobre = Animatore(
+        nome = "Dario",
+        cognome = "Trisconi",
+        domicilio = "Seregno",
+        auto = false,
+        adulti = true,
+        bambini = false,
+        note = "Datemidabbere"
+    )
+    private val darioNovembre = Animatore(
+        nome = "Dario",
+        cognome = "Trisconi",
+        domicilio = "Seregno",
+        auto = false,
+        adulti = true,
+        bambini = false,
+        note = "Datemidabberedippiù"
+    )
 
-    private val silviaOttobre = Animatore (nome= "Silvia", cognome = "Ratti", domicilio = "Seregno", auto = true, adulti = true, bambini = true, note = "Mai più ad Ancona")
-    private val silviaNovembre = Animatore (nome= "Silvia", cognome = "Ratti", domicilio = "Seregno", auto = true, adulti = true, bambini = true, note = "Avevo detto mai più :(")
+    private val silviaOttobre = Animatore(
+        nome = "Silvia",
+        cognome = "Ratti",
+        domicilio = "Seregno",
+        auto = true,
+        adulti = true,
+        bambini = true,
+        note = "Mai più ad Ancona"
+    )
+    private val silviaNovembre = Animatore(
+        nome = "Silvia",
+        cognome = "Ratti",
+        domicilio = "Seregno",
+        auto = true,
+        adulti = true,
+        bambini = true,
+        note = "Avevo detto mai più :("
+    )
 
 
     init {
         foglioOttobre.addAnimatore(silviaOttobre.label, silviaOttobre)
-        foglioOttobre.addAnimatore(darioOttobre.label, darioOttobre)
+        //foglioOttobre.addAnimatore(darioOttobre.label, darioOttobre)
 
         foglioNovembre.addAnimatore(silviaNovembre.label, silviaOttobre)
         foglioNovembre.addAnimatore(darioNovembre.label, darioOttobre)
@@ -69,6 +105,12 @@ class MockDataSource : IDisponibilitaDataSource{
 
     //endregion
 
-    override fun getMesi() : List<String> = malaFile.fogli
+    override fun getMesi(): List<String> = malaFile.fogli
+    override fun getAnimatori(mese: String): List<Animatore> =
+        when (mese) {
+            foglioOttobre.label -> foglioOttobre.animatori.map { it.value }.toList()
+            foglioNovembre.label -> foglioNovembre.animatori.map { it.value }.toList()
+            else -> emptyList()
+        }
 
 }

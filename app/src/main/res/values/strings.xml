@@ -4,4 +4,6 @@
     <string name="visualizza_disponibilita">Visualizza Disponibilità</string>
     <string name="dati_fattura">Dati Fattura</string>
     <string name="indietro">indietro</string>
+    <string name="seleziona_mese">Seleziona il mese</string>
+    <string name="seleziona_animatore">Seleziona Animatore</string>
 </resources>

@@ -11,11 +11,16 @@ fun <T> MalaSpinner (modifier: Modifier = Modifier,
                      label: String,
                      options: List<T>,
                      getOptionLabel: (T) -> String,
-                     onItemSelected: (T) -> Unit = {},
+                     onItemSelected: (T?) -> Unit = {},
+                     initiallySelected: String = "",
                      initiallyExpanded: Boolean = false) {
 
+
     var expanded by remember { mutableStateOf(initiallyExpanded) }
-    var selectedOptionText by remember { mutableStateOf("") }
+    var selectedOptionText by remember { mutableStateOf(initiallySelected) }
+
+    if (selectedOptionText !in options.map(getOptionLabel).toList()) {selectedOptionText = ""; onItemSelected(null)}
+
 
     ExposedDropdownMenuBox(
         modifier = modifier,
@@ -25,6 +30,7 @@ fun <T> MalaSpinner (modifier: Modifier = Modifier,
         TextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
             modifier = Modifier.menuAnchor(),
+            readOnly = true,
             value = selectedOptionText,
             onValueChange = { selectedOptionText = it },
             label = { Text(label) },

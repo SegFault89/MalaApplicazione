@@ -30,13 +30,14 @@ data class Foglio(
      * gli animatori indicati nel foglio presenze
      * viene usata una mappa per facilità di ricerca
      */
-    private val animatori: MutableMap<String, Animatore> = mutableMapOf()
+    private val _animatori: MutableMap<String, Animatore> = mutableMapOf()
 
+    val animatori : Map<String, Animatore> get() = _animatori
     /**
      * aggiunge un animatore al mese
      */
     fun addAnimatore(key: String, animatore: Animatore) {
-        animatori.put(key, animatore)
+        _animatori.put(key, animatore)
     }
 
 

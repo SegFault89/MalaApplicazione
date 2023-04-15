@@ -1,46 +1,61 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.asLiveData
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
+import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
 
 @Composable
 fun InserisciDisponibilita(
-    viewModel: MalaViewModel = MalaViewModel(
-        DisponibilitaRepository(
-            MockDataSource()
-        )
-    ), navigateUp: () -> Unit
+    viewModel: MalaViewModel,
+    navigateUp: () -> Unit
 ) {
     MalaScaffold(
         label = stringResource(id = R.string.inserisci_disponibilita),
         navigateUp = navigateUp
     )
     { contentPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Content()
-        }
+        Content(Modifier.padding(contentPadding), viewModel)
     }
 }
 
 @Composable
-fun Content() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        //MalaSpinner()
+fun Content(
+    modifier: Modifier = Modifier,
+    viewModel: MalaViewModel
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        MalaSpinner(label = stringResource(id = R.string.seleziona_mese),
+            options = viewModel.mesi,
+            getOptionLabel = { it },
+            onItemSelected = { it?.let{viewModel.selezionaMese(it)}})
+
+        var animatori = viewModel.animatori.asLiveData().observeAsState()
+
+        animatori.value?.let {
+            if (it.isNotEmpty()) {
+                MalaSpinner(label = stringResource(id = R.string.seleziona_animatore),
+                    options = it,
+                    getOptionLabel = { it2 -> it2.label },
+                    onItemSelected = {  })
+            }
+        }
     }
 }
 
@@ -48,5 +63,11 @@ fun Content() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewContent() {
-    Content()
+    Content(
+        viewModel = MalaViewModel(
+            DisponibilitaRepository(
+                MockDataSource()
+            )
+        )
+    )
 }
