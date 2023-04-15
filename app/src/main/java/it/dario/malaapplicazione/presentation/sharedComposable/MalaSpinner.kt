@@ -56,7 +56,7 @@ fun PreviewSpinner() {
     val options = listOf(SpinnerItem("1", 1), SpinnerItem("2", 2))
     MalaSpinner(label = "MalaSpinner",
         options= options,
-        getOptionLabel= SpinnerItem::getLabel)
+        getOptionLabel= SpinnerItem::label)
 }
 
 
@@ -64,5 +64,5 @@ private data class SpinnerItem (
     val text: String = "test",
     val value: Int = 1
 ) {
-    fun getLabel (): String  {return text}
+    val label: String get() =  text
 }

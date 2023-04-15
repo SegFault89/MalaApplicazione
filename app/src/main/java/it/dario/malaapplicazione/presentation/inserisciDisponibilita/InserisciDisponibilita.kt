@@ -9,10 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
+import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
 
 @Composable
-fun InserisciDisponibilita(navigateUp: () -> Unit) {
+fun InserisciDisponibilita(
+    viewModel: MalaViewModel = MalaViewModel(
+        DisponibilitaRepository(
+            MockDataSource()
+        )
+    ), navigateUp: () -> Unit
+) {
     MalaScaffold(
         label = stringResource(id = R.string.inserisci_disponibilita),
         navigateUp = navigateUp
@@ -29,7 +38,7 @@ fun InserisciDisponibilita(navigateUp: () -> Unit) {
 }
 
 @Composable
-fun Content(){
+fun Content() {
     Column(modifier = Modifier.fillMaxSize()) {
         //MalaSpinner()
     }
