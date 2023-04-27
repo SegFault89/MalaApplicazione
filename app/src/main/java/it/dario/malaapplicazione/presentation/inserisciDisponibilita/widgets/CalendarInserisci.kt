@@ -9,11 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.asLiveData
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import it.dario.malaapplicazione.data.Constants
+import it.dario.malaapplicazione.data.Constants.DISPONIBILE
+import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
+import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
+import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.data.model.Animatore
+import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -21,6 +31,16 @@ import java.time.YearMonth
 @Composable
 fun CalendarInserisci(
     modifier: Modifier = Modifier,
+    animatore: Animatore = Animatore(
+        nome = "Mario",
+        cognome = "Rossi",
+        domicilio = "Milano",
+        auto = true,
+        adulti = true,
+        bambini = true,
+        note = ""
+    ),
+    viewModel: MalaViewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())),
     startDate: LocalDate = LocalDate.of(2023, 8, 1),
     endDate: LocalDate = LocalDate.of(2023, 8, 31)
 ) {
@@ -30,6 +50,7 @@ fun CalendarInserisci(
     val startMonth = remember { YearMonth.of(startDate.year, startDate.month) }
     val endMonth = remember { YearMonth.of(endDate.year, endDate.month) }
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
+    val animatore = viewModel.disponibilitàAnimatore.asLiveData()
 
     val state = rememberCalendarState(
         startMonth = startMonth,
@@ -40,44 +61,36 @@ fun CalendarInserisci(
 
     HorizontalCalendar(
         state = state,
-        dayContent = { Day(it) }
+        dayContent = {
+            Day(
+                day = it,
+                enabled = !(it.date.isBefore(startDate) || it.date.isAfter(endDate)),
+                value = animatore.value!!.getDisponibilita(it.date)
+            )
+        }
     )
 }
 
 
 @Composable
-fun Day(day: CalendarDay) {
+fun Day(day: CalendarDay, enabled: Boolean, value: String) {
     Box(
-        modifier = Modifier
-            .aspectRatio(1f), // This is important for square sizing!
-        contentAlignment = Alignment.Center
+        modifier = Modifier.aspectRatio(1f), // This is important for square sizing!
+        contentAlignment = Alignment.Center,
     ) {
-        Text(text = day.date.dayOfMonth.toString())
+        Surface(
+            color = when (value) {
+                NON_DISPONIBILE -> Color.Red
+                DISPONIBILE -> Color.Green
+                NO_DISPONIBILITA -> Color.Transparent
+                else -> Color.Yellow
+            }
+        ) {
+            Text(
+                text = day.date.dayOfMonth.toString(),
+                color = if (enabled) Color.Black else Color.LightGray,
+            )
+        }
+
     }
 }
-
-/*
-@Composable
-fun DatePicker(
-    state: DatePickerState,
-    modifier: Modifier = Modifier,
-    dateFormatter: DatePickerFormatter = remember { DatePickerFormatter() },
-    dateValidator: (Long) -> Boolean = { true },
-    title: (@Composable () -> Unit)? = {
-        DatePickerDefaults.DatePickerTitle(
-            state,
-            modifier = Modifier.padding(DatePickerTitlePadding)
-        )
-    },
-    headline: (@Composable () -> Unit)? = {
-        DatePickerDefaults.DatePickerHeadline(
-            state,
-            dateFormatter,
-            modifier = Modifier.padding(DatePickerHeadlinePadding)
-        )
-    },
-    showModeToggle: Boolean = true,
-    colors: DatePickerColors = DatePickerDefaults.colors()
-): Unit
-
- */

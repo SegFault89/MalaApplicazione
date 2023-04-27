@@ -23,7 +23,7 @@ class MalaViewModel (val repository: DisponibilitaRepository) : ViewModel() {
         meseSelezionato.debounce(200).distinctUntilChanged().map { repository.getAnimatori(it) }
 
     val disponibilitàAnimatore =
-        animatoreSelezionato.debounce(200).distinctUntilChanged().map { repository.getAnimatori(it) }
+        animatoreSelezionato.debounce(200).distinctUntilChanged().map { repository.getAnimatore(it) }
 }
 
 @Suppress("UNCHECKED_CAST")

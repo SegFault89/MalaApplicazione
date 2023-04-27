@@ -12,4 +12,8 @@ class DisponibilitaRepository (val datasource: IDisponibilitaDataSource) {
     fun getAnimatori(mese: String) : List<Animatore> {
         return datasource.getAnimatori(mese)
     }
+
+    fun getAnimatore(animatore: String) : Animatore? {
+        return datasource.getAnimatore(animatore)
+    }
 }

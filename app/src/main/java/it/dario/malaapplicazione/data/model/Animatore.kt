@@ -1,5 +1,6 @@
 package it.dario.malaapplicazione.data.model
 
+import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import java.time.LocalDate
 
 /**
@@ -34,7 +35,16 @@ data class Animatore(
     private val disponibilita: MutableMap<LocalDate, String> = mutableMapOf()
 
     fun setDisponibilita(date: LocalDate, content: String) {
-        disponibilita.put(date, content)
+        disponibilita[date] = content
     }
 
+    /**
+     * restituisce la disponibilità dell'animatore per una determinata data
+     *
+     * @param date la data da prendere in considerazione
+     * @return la disponibilità data dall'animatore, o [NO_DISPONIBILITA] in assenza
+     */
+    fun getDisponibilita(date: LocalDate) : String {
+        return disponibilita[date] ?: NO_DISPONIBILITA
+    }
 }
