@@ -46,14 +46,15 @@ fun Content(
             getOptionLabel = { it },
             onItemSelected = { it?.let{viewModel.selezionaMese(it)}})
 
-        var animatori = viewModel.animatori.asLiveData().observeAsState()
+        val animatori = viewModel.animatori.asLiveData().observeAsState()
+
 
         animatori.value?.let {
             if (it.isNotEmpty()) {
                 MalaSpinner(label = stringResource(id = R.string.seleziona_animatore),
                     options = it,
                     getOptionLabel = { it2 -> it2.label },
-                    onItemSelected = {  })
+                    onItemSelected = { it2 -> it2?.let { it3 -> viewModel.selezionaAnimatore(it3.label) } })
             }
         }
     }

@@ -1,10 +1,9 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.material3.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -16,12 +15,10 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import it.dario.malaapplicazione.data.datasources.MockDataSource
-import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
 import java.time.LocalDate
@@ -31,15 +28,6 @@ import java.time.YearMonth
 @Composable
 fun CalendarInserisci(
     modifier: Modifier = Modifier,
-    animatore: Animatore = Animatore(
-        nome = "Mario",
-        cognome = "Rossi",
-        domicilio = "Milano",
-        auto = true,
-        adulti = true,
-        bambini = true,
-        note = ""
-    ),
     viewModel: MalaViewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())),
     startDate: LocalDate = LocalDate.of(2023, 8, 1),
     endDate: LocalDate = LocalDate.of(2023, 8, 31)
