@@ -14,33 +14,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.domain.utils.rangeTo
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
+import java.text.DateFormatSymbols
 import java.time.LocalDate
+import java.util.Calendar
 
-@Preview
+private val MY_DAY_OF_WEEK_TO_CALENDAR = arrayOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY)
+fun DateFormatSymbols.getShortWeekdaysByMyDayOfWeek() = Array(7) { shortWeekdays[MY_DAY_OF_WEEK_TO_CALENDAR[it]] }
+
+@Preview(showBackground = true)
 @Composable
 fun MalaCalendario(
     modifier: Modifier = Modifier,
     viewModel: MalaViewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())),
     startDate: LocalDate = LocalDate.of(2023, 8, 1),
-    endDate: LocalDate = LocalDate.of(2023, 8, 31),
+    endDate: LocalDate = LocalDate.of(2023, 9, 4),
     dayContent: @Composable BoxScope.(LocalDate) -> Unit = { PreviewDay(day = it)},
     ) {
+
+    val offsetItems = (0 until startDate.dayOfWeek.value-1).toList()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
 
-        items(headers) {HeaderDay(it)}
-        items((1..31).toList()) {
-            PreviewDay(LocalDate.of(2023,5,it))
+        items(DateFormatSymbols().getShortWeekdaysByMyDayOfWeek()) {HeaderDay(it)}
+        items(offsetItems) { BlankDay()}
+        items(startDate.rangeTo(endDate).toList()) {
+            PreviewDay(it)
         }
     }
 
 }
-
-private val headers = listOf("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom")
 
 @Composable
 private fun HeaderDay(label: String) {
@@ -55,6 +62,15 @@ private fun HeaderDay(label: String) {
     }
 }
 
+
+@Composable
+private fun BlankDay() {
+    Box(
+        modifier = Modifier.aspectRatio(1f), // This is important for square sizing!
+        contentAlignment = Alignment.Center,
+    ) {
+    }
+}
 
 
 @Composable
