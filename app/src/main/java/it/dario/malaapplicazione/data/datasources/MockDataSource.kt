@@ -105,7 +105,7 @@ class MockDataSource : IDisponibilitaDataSource {
 
     //endregion
 
-    private var foglioSelezionato : Foglio? = null
+    private var foglioSelezionato: Foglio? = null
     override fun getMesi(): List<String> = malaFile.fogli
     override fun getAnimatori(mese: String): List<Animatore> {
         foglioSelezionato = when (mese) {
@@ -118,5 +118,13 @@ class MockDataSource : IDisponibilitaDataSource {
 
     override fun getAnimatore(animatore: String): Animatore? {
         return foglioSelezionato?.animatori?.get(animatore)
+    }
+
+    override fun getFoglio(name: String): Foglio {
+        return when (name) {
+            foglioOttobre.label -> foglioOttobre
+            foglioNovembre.label -> foglioNovembre
+            else -> error("come ci sei arrivato qui?")
+        }
     }
 }

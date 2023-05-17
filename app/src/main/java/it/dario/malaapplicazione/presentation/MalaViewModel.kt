@@ -2,6 +2,7 @@ package it.dario.malaapplicazione.presentation.visualizzaDisponibilita
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import kotlinx.coroutines.flow.*
 
@@ -9,21 +10,23 @@ class MalaViewModel (val repository: DisponibilitaRepository) : ViewModel() {
 
     val mesi = repository.getMesi()
 
-    private var meseSelezionato: MutableStateFlow<String> = MutableStateFlow("")
-    private var animatoreSelezionato: MutableStateFlow<String> = MutableStateFlow("")
+    private var meseSelezionatoStr: MutableStateFlow<String> = MutableStateFlow("")
+    private var animatoreSelezionatoStr: MutableStateFlow<String> = MutableStateFlow("")
 
     fun selezionaMese(mese: String) {
-        meseSelezionato.value = mese
+        meseSelezionatoStr.value = mese
     }
     fun selezionaAnimatore(mese: String) {
-        meseSelezionato.value = mese
+        animatoreSelezionatoStr.value = mese
     }
 
-    val animatori =
-        meseSelezionato.debounce(200).distinctUntilChanged().map { repository.getAnimatori(it) }
+    val foglio: Foglio get() = repository.getFoglio(meseSelezionatoStr.value)
 
-    val disponibilitàAnimatore =
-        animatoreSelezionato.debounce(200).distinctUntilChanged().map { repository.getAnimatore(it) }
+    val animatori =
+        meseSelezionatoStr.debounce(200).distinctUntilChanged().map { repository.getAnimatori(it) }
+
+    val disponibilitaAnimatore =
+        animatoreSelezionatoStr.debounce(200).distinctUntilChanged().map { repository.getAnimatore(it) }
 }
 
 @Suppress("UNCHECKED_CAST")
