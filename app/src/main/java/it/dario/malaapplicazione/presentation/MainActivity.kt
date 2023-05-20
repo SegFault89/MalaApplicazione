@@ -21,17 +21,28 @@ import it.dario.malaapplicazione.presentation.datiFattura.DatiFattura
 import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModelFactory
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModelFactory
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.VisualizzaDisponibilita
 
 class MainActivity : ComponentActivity() {
 
-    private val viewiewModel: MalaViewModel by viewModels {
+    private val dataSource = MockDataSource() //TODO modificare qui il data source
+
+    private val viewModel: MalaViewModel by viewModels {
         MalaViewModelFactory(
-            repository = DisponibilitaRepository(MockDataSource()) //TODO modificare qui il data source
+            repository = DisponibilitaRepository(datasource = dataSource)
         )
     }
+    private val inserisciDisponibilitaViewModel: InserisciDisponibilitaViewModel by viewModels {
+        InserisciDisponibilitaViewModelFactory (
+            repository = DisponibilitaRepository(datasource = dataSource)
+        )
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -59,7 +70,7 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToDatiFattura = { navController.navigate(DATI_FATTURA) }
                             )
                         }
-                        composable(INSERISCI_DISPONIBILITA) { InserisciDisponibilita( viewModel = viewiewModel, navigateUp = navController::navigateUp) }
+                        composable(INSERISCI_DISPONIBILITA) { InserisciDisponibilita( viewModel = inserisciDisponibilitaViewModel, navigateUp = navController::navigateUp) }
                         composable(VISUALIZZA_DISPONIBILITA) { VisualizzaDisponibilita(navigateUp = navController::navigateUp) }
                         composable(DATI_FATTURA) { DatiFattura(navigateUp = navController::navigateUp) }
                     }

@@ -27,10 +27,9 @@ fun DateFormatSymbols.getShortWeekdaysByMyDayOfWeek() = Array(7) { shortWeekdays
 @Composable
 fun MalaCalendario(
     modifier: Modifier = Modifier,
-    viewModel: MalaViewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())),
     startDate: LocalDate = LocalDate.of(2023, 8, 1),
     endDate: LocalDate = LocalDate.of(2023, 9, 4),
-    dayContent: @Composable BoxScope.(LocalDate) -> Unit = { PreviewDay(day = it)},
+    dayContent: @Composable (LocalDate) -> Unit = { PreviewDay(day = it)},
     ) {
 
     val offsetItems = (0 until startDate.dayOfWeek.value-1).toList()
@@ -43,7 +42,7 @@ fun MalaCalendario(
         items(DateFormatSymbols().getShortWeekdaysByMyDayOfWeek()) {HeaderDay(it)}
         items(offsetItems) { BlankDay()}
         items(startDate.rangeTo(endDate).toList()) {
-            PreviewDay(it)
+            dayContent(it)
         }
     }
 
@@ -82,6 +81,5 @@ private fun PreviewDay(day: LocalDate) {
             Text(
                 text = day.dayOfMonth.toString(),
             )
-
     }
 }

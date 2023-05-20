@@ -1,6 +1,10 @@
 package it.dario.malaapplicazione.data.model
 
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 
 /**
@@ -32,10 +36,14 @@ data class Animatore(
     /**
      * la disponibilità data dall'animatore per il giorno indicato come chiave
      */
-    private val disponibilita: MutableMap<LocalDate, String> = mutableMapOf()
+    private val disponibilita: MutableMap<LocalDate, MutableStateFlow<String>> = mutableMapOf()
 
     fun setDisponibilita(date: LocalDate, content: String) {
-        disponibilita[date] = content
+        disponibilita[date] = MutableStateFlow(content)
+    }
+
+    fun updateDisponibilita(date: LocalDate, content: String) {
+        disponibilita[date]!!.value = content
     }
 
     /**
@@ -45,6 +53,12 @@ data class Animatore(
      * @return la disponibilità data dall'animatore, o [NO_DISPONIBILITA] in assenza
      */
     fun getDisponibilita(date: LocalDate) : String {
-        return disponibilita[date] ?: NO_DISPONIBILITA
+        return disponibilita[date]?.value ?: NO_DISPONIBILITA
+    }
+
+    fun getDisponibilitaAsFlow(date: LocalDate) : StateFlow<String> {
+        return disponibilita[date]?.asStateFlow() ?: run {
+            disponibilita[date] = MutableStateFlow("")
+            return disponibilita[date]!!.asStateFlow() }
     }
 }

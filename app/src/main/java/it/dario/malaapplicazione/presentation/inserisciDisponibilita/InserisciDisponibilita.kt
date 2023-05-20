@@ -1,20 +1,16 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita
 
-import android.widget.CalendarView
-import android.widget.DatePicker
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.DateRangePicker
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.Key.Companion.Calendar
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.asLiveData
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.datasources.MockDataSource
@@ -23,13 +19,11 @@ import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.Gio
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.MalaCalendario
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
-import java.time.ZoneId
-import java.util.Calendar
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
 
 @Composable
 fun InserisciDisponibilita(
-    viewModel: MalaViewModel,
+    viewModel: InserisciDisponibilitaViewModel,
     navigateUp: () -> Unit
 ) {
     MalaScaffold(
@@ -44,42 +38,48 @@ fun InserisciDisponibilita(
 @Composable
 fun Content(
     modifier: Modifier = Modifier,
-    viewModel: MalaViewModel
+    viewModel: InserisciDisponibilitaViewModel
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Spinner mese
-        MalaSpinner(label = stringResource(id = R.string.seleziona_mese),
+        val currentState by viewModel.uiState.collectAsState()
+
+        // Spinner foglio
+        MalaSpinner(
+            label = stringResource(id = R.string.seleziona_foglio),
             options = viewModel.mesi,
             getOptionLabel = { it },
-            onItemSelected = { it?.let { viewModel.selezionaMese(it) } })
+            selected = currentState.foglioSelezionato,
+            onItemSelected = viewModel::updateFoglioSelezionato
+        )
 
-        // Spinenr animatore
-        val animatori = viewModel.animatori.asLiveData().observeAsState()
-        animatori.value?.let {
+        //spinner animatore
+        currentState.foglioSelezionato?.let {
             if (it.isNotEmpty()) {
-                MalaSpinner(label = stringResource(id = R.string.seleziona_animatore),
-                    options = it,
-                    getOptionLabel = { it2 -> it2.label },
-                    onItemSelected = { it2 -> it2?.let { it3 -> viewModel.selezionaAnimatore(it3.label) } })
+                MalaSpinner(
+                    label = stringResource(id = R.string.seleziona_animatore),
+                    options = viewModel.getAnimatoriInFoglio(it),
+                    getOptionLabel = { animatore -> animatore.label },
+                    onItemSelected = viewModel::updateAnimatoreSelezionato,
+                    selected = currentState.animatoreSelezionato
+                )
             }
         }
 
-        // Calendario Animatore
-        val animatore = viewModel.disponibilitaAnimatore.asLiveData().observeAsState()
-        animatore.value?.let {
-            val foglio = viewModel.foglio
+        currentState.animatoreSelezionato?.let {animatore ->
+            val foglio = viewModel.getFoglio(currentState.foglioSelezionato!!) // TODO not null check giusto per essere sicuri?
             MalaCalendario(
-                viewModel = viewModel,
                 startDate = foglio.primoGiorno,
                 endDate = foglio.ultimoGiorno,
                 dayContent = {
                     GiornoInserisci(
+                        viewModel= viewModel,
                         day = it,
-                        value = animatore.value!!.getDisponibilita(it)
+                        foglio = foglio,
+                        animatore = animatore
                     )
                 }
             )
@@ -87,11 +87,12 @@ fun Content(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewContent() {
     Content(
-        viewModel = MalaViewModel(
+        viewModel = InserisciDisponibilitaViewModel(
             DisponibilitaRepository(
                 MockDataSource()
             )
