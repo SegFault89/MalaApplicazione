@@ -1,12 +1,10 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -20,8 +18,6 @@ import androidx.compose.ui.unit.dp
 import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
-import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
 import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
@@ -34,11 +30,11 @@ import java.time.LocalDate
 fun GiornoInserisci(
     viewModel: InserisciDisponibilitaViewModel,
     day: LocalDate,
-    foglio: Foglio,
-    animatore: Animatore
+    foglio: String,
+    animatore: String
 ) {
 
-    val currentValue by animatore.getDisponibilitaAsFlow(day).collectAsState()
+    val currentValue by viewModel.getDisponibilitaAsFlow(foglio, animatore, day).collectAsState()
 
     Box(
         modifier = Modifier
@@ -59,8 +55,8 @@ fun GiornoInserisci(
             ),
             onClick = {
                 viewModel.updateAnimatoreDisponibilita(
-                    animatore,
                     foglio,
+                    animatore,
                     day,
                     if (currentValue == DISPONIBILE) NON_DISPONIBILE else DISPONIBILE
                 )

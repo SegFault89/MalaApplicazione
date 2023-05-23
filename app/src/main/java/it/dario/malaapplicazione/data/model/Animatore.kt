@@ -1,7 +1,6 @@
 package it.dario.malaapplicazione.data.model
 
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,24 +9,36 @@ import java.time.LocalDate
 /**
  * rappresenta un animatore e le sue disponibilità date
  *
- * @param nome nome dell'animatore
- * @param cognome cognome dell'animatore
- * @param domicilio indirizzo di domicilio dell'animatore
- * @param auto disponibilità auto
- * @param bambini disponibilità per attività bambini
- * @param adulti disponibilità per attività adulti
- * @param note note
+ * @param _nome nome dell'animatore
+ * @param _cognome cognome dell'animatore
+ * @param _domicilio indirizzo di domicilio dell'animatore
+ * @param _auto disponibilità auto
+ * @param _bambini disponibilità per attività bambini
+ * @param _adulti disponibilità per attività adulti
+ * @param _note note
  */
 data class Animatore(
     val nome: String,
     val cognome: String,
-    var domicilio: String,
-    var auto: Boolean,
-    var bambini: Boolean,
-    var adulti: Boolean,
-    var note: String,
+    private var _domicilio: String,
+    private var _auto: Boolean,
+    private var _bambini: Boolean,
+    private var _adulti: Boolean,
+    private var _note: String,
 ) {
 
+    //duplicate per mantenere il set priivato
+    val domicilio: String get() = _domicilio
+    val note: String get() = _note
+    val auto: Boolean get() = _auto
+    val adulti: Boolean get() = _adulti
+    val bambini: Boolean get() = _bambini
+
+    private val domicilioFlow = MutableStateFlow(_domicilio)
+    private val autoFlow = MutableStateFlow(_auto)
+    private val bambiniFlow = MutableStateFlow(_bambini)
+    private val adultiFlow = MutableStateFlow(_adulti)
+    private val noteFlow = MutableStateFlow(_note)
     /**
      * etichetta che verrà usata per mostrare il nome nello spinner
      */
@@ -61,4 +72,50 @@ data class Animatore(
             disponibilita[date] = MutableStateFlow("")
             return disponibilita[date]!!.asStateFlow() }
     }
+
+    fun getDomicilioAsFlow(): StateFlow<String> {
+        return domicilioFlow.asStateFlow()
+    }
+
+    fun updateDomicilio (value: String) {
+        _domicilio = value
+        domicilioFlow.value = value
+    }
+
+    fun getAutoAsFlow(): StateFlow<Boolean> {
+        return autoFlow.asStateFlow()
+    }
+
+    fun updateAuto(value: Boolean) {
+        _auto = value
+        autoFlow.value = value
+    }
+
+    fun getBambiniAsFlow (): StateFlow<Boolean> {
+        return bambiniFlow.asStateFlow()
+    }
+
+    fun updateBambini (value: Boolean) {
+        _bambini = value
+        bambiniFlow.value = value
+    }
+
+    fun getAdultiAsFlow (): StateFlow<Boolean> {
+        return adultiFlow.asStateFlow()
+    }
+
+    fun updateAdulti (value: Boolean) {
+        _adulti = value
+        adultiFlow.value = value
+    }
+
+    fun getNoteAsFlow(): StateFlow<String> {
+        return noteFlow.asStateFlow()
+    }
+
+    fun updateNote (value: String) {
+        _note = value
+        noteFlow.value = value
+    }
+
 }

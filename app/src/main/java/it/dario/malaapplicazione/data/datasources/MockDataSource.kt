@@ -4,6 +4,7 @@ import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.data.model.MalaFile
 import it.dario.malaapplicazione.domain.utils.LocalDateIterator
+import kotlinx.coroutines.flow.StateFlow
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
@@ -15,9 +16,9 @@ import java.time.Month
 class MockDataSource : IDisponibilitaDataSource {
 
     //region dati fittizi
-    private val malaFile = MalaFile(fogli = listOf("Ottobre'23", "Novembre'23"))
+    val malaFile = MalaFile(fogli = listOf("Ottobre'23", "Novembre'23"))
 
-    private val foglioOttobre = Foglio(
+    val foglioOttobre = Foglio(
         meseString = "Ottobre",
         annoString = "23",
         meseInt = Month.OCTOBER.value,
@@ -26,7 +27,7 @@ class MockDataSource : IDisponibilitaDataSource {
         ultimoGiorno = LocalDate.of(2023, Month.NOVEMBER.value, 1).minusDays(1)
     )
 
-    private val foglioNovembre = Foglio(
+    val foglioNovembre = Foglio(
         meseString = "Novembre",
         annoString = "23",
         meseInt = Month.NOVEMBER.value,
@@ -39,42 +40,42 @@ class MockDataSource : IDisponibilitaDataSource {
         ) //il foglio novembre va fino al 4 dicembre perchè se no è facile
     )
 
-    private val darioOttobre = Animatore(
+    val darioOttobre = Animatore(
         nome = "Dario",
         cognome = "Trisconi",
-        domicilio = "Seregno",
-        auto = false,
-        adulti = true,
-        bambini = false,
-        note = "Datemidabbere"
+        _domicilio = "Seregno",
+        _auto = false,
+        _adulti = true,
+        _bambini = false,
+        _note = "Datemidabbere"
     )
-    private val darioNovembre = Animatore(
+    val darioNovembre = Animatore(
         nome = "Dario",
         cognome = "Trisconi",
-        domicilio = "Seregno",
-        auto = false,
-        adulti = true,
-        bambini = false,
-        note = "Datemidabberedippiù"
+        _domicilio = "Seregno",
+        _auto = false,
+        _adulti = true,
+        _bambini = false,
+        _note = "Datemidabberedippiù"
     )
 
-    private val silviaOttobre = Animatore(
+    val silviaOttobre = Animatore(
         nome = "Silvia",
         cognome = "Ratti",
-        domicilio = "Seregno",
-        auto = true,
-        adulti = true,
-        bambini = true,
-        note = "Mai più ad Ancona"
+        _domicilio = "Seregno",
+        _auto = true,
+        _adulti = true,
+        _bambini = true,
+        _note = "Mai più ad Ancona"
     )
-    private val silviaNovembre = Animatore(
+    val silviaNovembre = Animatore(
         nome = "Silvia",
         cognome = "Ratti",
-        domicilio = "Seregno",
-        auto = true,
-        adulti = true,
-        bambini = true,
-        note = "Avevo detto mai più :("
+        _domicilio = "Seregno",
+        _auto = true,
+        _adulti = true,
+        _bambini = true,
+        _note = "Avevo detto mai più :("
     )
 
 
@@ -105,19 +106,55 @@ class MockDataSource : IDisponibilitaDataSource {
 
     //endregion
 
-    private var foglioSelezionato: Foglio? = null
-    override fun getMesi(): List<String> = malaFile.fogli
-    override fun getAnimatori(mese: String): List<Animatore> {
-        foglioSelezionato = when (mese) {
-            foglioOttobre.label -> foglioOttobre
-            foglioNovembre.label -> foglioNovembre
-            else -> null
-        }
-        return foglioSelezionato?.animatori?.map { it.value }?.toList() ?: emptyList()
+    //private var foglioSelezionato: Foglio? = null
+    override fun getFogli(): List<String> = malaFile.fogli
+
+    override fun getAnimatori(foglio: String): List<Animatore> =
+        getFoglio(foglio).animatori.map { it.value }.toList()
+
+
+    override fun getAnimatore(foglio: String, animatore: String): Animatore {
+        return getFoglio(foglio).animatori[animatore]!!
     }
 
-    override fun getAnimatore(animatore: String): Animatore? {
-        return foglioSelezionato?.animatori?.get(animatore)
+    override fun getDomicilioAsFlow(foglio: String, animatore: String): StateFlow<String> {
+        return getAnimatore(foglio, animatore).getDomicilioAsFlow()
+    }
+
+    override fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getAutoAsFlow()
+    }
+
+    override fun getBambiniAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getBambiniAsFlow()
+    }
+
+    override fun getAdultiAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getAdultiAsFlow()
+    }
+
+    override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
+        return getAnimatore(foglio, animatore).getNoteAsFlow()
+    }
+
+    override fun updateDomicilio(foglio: String, animatore: String, value: String) {
+        getAnimatore(foglio, animatore).updateDomicilio(value)
+    }
+
+    override fun updateAuto(foglio: String, animatore: String, value: Boolean) {
+        getAnimatore(foglio, animatore).updateAuto(value)
+    }
+
+    override fun updateBambini(foglio: String, animatore: String, value: Boolean) {
+        getAnimatore(foglio, animatore).updateBambini(value)
+    }
+
+    override fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
+        getAnimatore(foglio, animatore).updateAdulti(value)
+    }
+
+    override fun updateNote(foglio: String, animatore: String, value: String) {
+        getAnimatore(foglio, animatore).updateNote(value)
     }
 
     override fun getFoglio(name: String): Foglio {
@@ -126,5 +163,17 @@ class MockDataSource : IDisponibilitaDataSource {
             foglioNovembre.label -> foglioNovembre
             else -> error("come ci sei arrivato qui?")
         }
+    }
+
+    override fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate): StateFlow<String> =
+        getAnimatore(foglio, animatore)!!.getDisponibilitaAsFlow(date)
+
+    override fun setDisponibilita(
+        foglio: String,
+        animatore: String,
+        date: LocalDate,
+        content: String
+    ) {
+        getAnimatore(foglio, animatore).updateDisponibilita(date, content)
     }
 }

@@ -1,7 +1,5 @@
 package it.dario.malaapplicazione.presentation.sharedComposable
 
-import android.content.res.Configuration
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,28 +13,26 @@ fun <T> MalaSpinner(
     options: List<T>,
     getOptionLabel: (T) -> String,
     onItemSelected: (T) -> Unit = {},
-    selected: T?,
+    selected: String?,
     initiallyExpanded: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(initiallyExpanded) }
-
-    //Lista delle etichette (opzioni visibili)
-    val optionsLabel = options.map { getOptionLabel }.toList()
 
     ExposedDropdownMenuBox(
         modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
-        TextField(
+        OutlinedTextField(
             // The `menuAnchor` modifier must be passed to the text field for correctness.
-            modifier = Modifier.menuAnchor(),
+            modifier = modifier.menuAnchor(),
             readOnly = true,
-            value = selected?.let { getOptionLabel(it) } ?: "",
+            value = selected ?: "",
             onValueChange = { },
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors()
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+
         )
         ExposedDropdownMenu(
             expanded = expanded,

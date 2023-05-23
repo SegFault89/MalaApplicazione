@@ -9,29 +9,30 @@ import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciUi
 import kotlinx.coroutines.flow.*
 import java.time.LocalDate
 
-class InserisciDisponibilitaViewModel (val repository: DisponibilitaRepository) : ViewModel() {
+class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
 
 
-    private val _uiState : MutableStateFlow<InserisciUiState> = MutableStateFlow(InserisciUiState(null, null))
-    val uiState: StateFlow<InserisciUiState> get () = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<InserisciUiState> =
+        MutableStateFlow(InserisciUiState(null, null))
+    val uiState: StateFlow<InserisciUiState> get() = _uiState.asStateFlow()
 
     var foglioSelezionato: String? = null
-    var animatoreSelezionato: Animatore? = null
+    var animatoreSelezionato: String? = null
 
-    val mesi = repository.getMesi()
+    val mesi = repository.getFogli()
 
-    fun updateFoglioSelezionato (newValue: String) {
-        if (foglioSelezionato != newValue){
+    fun updateFoglioSelezionato(newValue: String) {
+        if (foglioSelezionato != newValue) {
             foglioSelezionato = newValue
             animatoreSelezionato = null
-            _uiState.value =(InserisciUiState(foglioSelezionato, animatoreSelezionato))
+            _uiState.value = (InserisciUiState(foglioSelezionato, animatoreSelezionato))
         }
     }
 
-    fun updateAnimatoreSelezionato (newValue: Animatore) {
-        if (animatoreSelezionato != newValue){
+    fun updateAnimatoreSelezionato(newValue: String) {
+        if (animatoreSelezionato != newValue) {
             animatoreSelezionato = newValue
-            _uiState.value =(InserisciUiState(foglioSelezionato, animatoreSelezionato))
+            _uiState.value = (InserisciUiState(foglioSelezionato, animatoreSelezionato))
         }
     }
 
@@ -43,38 +44,28 @@ class InserisciDisponibilitaViewModel (val repository: DisponibilitaRepository) 
         return repository.getFoglio(foglio)
     }
 
-    fun updateAnimatoreDisponibilita(animatore: Animatore, foglio: Foglio, day: LocalDate, newValue: String) {
-        //TODO passare da repository per aggiornamento online
-        animatore.updateDisponibilita(day, newValue)
+    fun getAnimatore(foglio: String, animatore: String): Animatore {
+        return repository.getAnimatore(foglio, animatore)
     }
 
-    /*
-        private var _animatoreSelezionato: MutableStateFlow<Animatore?> = MutableStateFlow(null)
+    fun getDisponibilitaAsFlow(foglio: String, animatore: String, day: LocalDate) =
+        repository.getDisponibilitaAsFlow(foglio, animatore, day)
 
+    fun updateAnimatoreDisponibilita(
+        foglio: String,
+        animatore: String,
+        day: LocalDate,
+        newValue: String
+    ) {
+        repository.setDisponibilita(foglio, animatore, day, newValue)
+    }
 
-        fun updateUiState(newEvent: InserisciEvent) {
-        val newState =
-            when (newEvent) {
-                is InserisciEvent.eventSheetChanged -> InserisciUiState(newEvent.newSheet, null)
-                is InserisciEvent.eventAnimatorChanged -> InserisciUiState(foglioSelezionato.foglio, null)animatoreSelezionato = newState.newAnimatore
-            }
-            _uiState.value = newState
-        }
+    fun updateDomicilio(foglio: String, animatore: String, value: String) = repository.updateDomicilio(foglio, animatore, value)
+    fun updateNote(foglio: String, animatore: String, value: String) = repository.updateNote(foglio, animatore, value)
 
-
-        fun selezionaAnimatore(mese: String) {
-            animatoreSelezionatoStr.value = mese
-        }
-
-
-        val foglio: Foglio get() = repository.getFoglio(meseSelezionatoStr.value)
-
-        val animatori = foglioSelezionato?.let { repository.getAnimatori(it) }
-
-        val disponibilitaAnimatore =
-            animatoreSelezionatoStr.debounce(100).distinctUntilChanged().map { repository.getAnimatore(it) }
-
-        val getAnimatore = repository.getAnimatore(animatoreSelezionatoStr.value)*/
+    fun updateAuto(foglio: String, animatore: String, value: Boolean) = repository.updateAuto(foglio, animatore, value)
+    fun updateBambini(foglio: String, animatore: String, value: Boolean) = repository.updateBambini(foglio, animatore, value)
+    fun updateAdulti(foglio: String, animatore: String, value: Boolean) = repository.updateAdulti(foglio, animatore, value)
 }
 
 @Suppress("UNCHECKED_CAST")
