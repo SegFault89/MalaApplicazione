@@ -1,11 +1,10 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -14,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
+import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.GiornoInserisci
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.MalaCalendario
 import it.dario.malaapplicazione.presentation.sharedComposable.LabeledCheckbox
+import it.dario.malaapplicazione.presentation.sharedComposable.MalaOutlinedTextBox
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
@@ -69,7 +70,7 @@ fun Content(
         )
 
         //spinner animatore
-        currentState.foglioSelezionato?.let {foglio ->
+        currentState.foglioSelezionato?.let { foglio ->
             if (foglio.isNotEmpty()) {
                 MalaSpinner<Animatore>(
                     modifier = spinnerModifier,
@@ -81,7 +82,7 @@ fun Content(
                 )
 
                 currentState.animatoreSelezionato?.let { animatore ->
-                    AnimatoreData(viewModel = viewModel, animatore = animatore, foglio = foglio )
+                    AnimatoreData(viewModel = viewModel, animatore = animatore, foglio = foglio)
                 }
             }
         }
@@ -95,65 +96,54 @@ fun AnimatoreData(
     foglio: String,
 ) {
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        viewModel.getFoglio(foglio).let { malaFoglio ->
-            MalaCalendario(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = VerticalSpacingNormal),
-                startDate = malaFoglio.primoGiorno,
-                endDate = malaFoglio.ultimoGiorno,
-                dayContent = {
-                    GiornoInserisci(
-                        viewModel = viewModel,
-                        day = it,
-                        foglio = malaFoglio.label,
-                        animatore = animatore
-                    )
-                }
+    Log.d(Constants.TAG, "composing AnimatoreData")
+
+
+    MalaCalendario(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = VerticalSpacingNormal),
+        startDate = viewModel.getPrimoGiorno(foglio),
+        endDate = viewModel.getUltimoGiorno(foglio),
+        dayContent = {
+            GiornoInserisci(
+                viewModel = viewModel,
+                day = it,
+                foglio = foglio,
+                animatore = animatore
             )
         }
+    )
 
-        viewModel.getAnimatore(foglio, animatore).let { malaAnimatore ->
+    MalaOutlinedTextBox(
+        modifier = Modifier.fillMaxWidth(),
+        label = stringResource(id = R.string.domicilio),
+        toObserve = viewModel.getDomicilioAsFlow(foglio, animatore),
+        onValueChangeListener = { viewModel.updateDomicilio(foglio, animatore, it) })
 
-            // TODO SISTEMARE PASSANDO PER VIEWMODEL E NON DI ANIMATORE DIRETTO
-            val domicilioState by malaAnimatore.getDomicilioAsFlow().collectAsState()
-            val noteState by malaAnimatore.getNoteAsFlow().collectAsState()
+    MalaOutlinedTextBox(
+        modifier = Modifier.fillMaxWidth(),
+        label = stringResource(id = R.string.note),
+        toObserve = viewModel.getNoteAsFlow(foglio, animatore),
+        onValueChangeListener = { viewModel.updateNote(foglio, animatore, it) })
 
+    LabeledCheckbox(
+        toObserve = viewModel.getAutoAsFlow(foglio, animatore),
+        label = stringResource(id = R.string.auto),
+        onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
+    )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = domicilioState,
-                onValueChange = { viewModel.updateDomicilio(foglio, animatore, it)},
-                label = { Text("DOMICILIO") },
-            )
+    LabeledCheckbox(
+        label = stringResource(id = R.string.adulti),
+        onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
+        toObserve = viewModel.getAdultiAsFlow(foglio, animatore)
+    )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = noteState,
-                onValueChange = { viewModel.updateNote(foglio, animatore, it) },
-                label = { Text("NOTE") },
-            )
-
-            LabeledCheckbox(
-                toObserve = malaAnimatore.getAutoAsFlow(),
-                label = "AUTO",
-                onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
-            )
-
-            LabeledCheckbox(
-                label = "ADULTI",
-                onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
-                toObserve = malaAnimatore.getAdultiAsFlow()
-            )
-
-            LabeledCheckbox(
-                label = "BAMBINI",
-                onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
-                toObserve = malaAnimatore.getBambiniAsFlow()
-            )
-        }
-    }
+    LabeledCheckbox(
+        label = stringResource(id = R.string.bambini),
+        onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
+        toObserve = viewModel.getBambiniAsFlow(foglio, animatore)
+    )
 }
 
 

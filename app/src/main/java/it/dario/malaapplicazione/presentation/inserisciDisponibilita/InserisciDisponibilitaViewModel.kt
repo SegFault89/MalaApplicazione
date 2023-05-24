@@ -3,7 +3,6 @@ package it.dario.malaapplicazione.presentation.visualizzaDisponibilita
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciUiState
 import kotlinx.coroutines.flow.*
@@ -40,12 +39,12 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
         return repository.getAnimatori(foglio)
     }
 
-    fun getFoglio(foglio: String): Foglio {
-        return repository.getFoglio(foglio)
+    fun getPrimoGiorno(foglio: String): LocalDate {
+        return repository.getFoglio(foglio).primoGiorno
     }
 
-    fun getAnimatore(foglio: String, animatore: String): Animatore {
-        return repository.getAnimatore(foglio, animatore)
+    fun getUltimoGiorno(foglio: String): LocalDate {
+        return repository.getFoglio(foglio).ultimoGiorno
     }
 
     fun getDisponibilitaAsFlow(foglio: String, animatore: String, day: LocalDate) =
@@ -60,11 +59,29 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
         repository.setDisponibilita(foglio, animatore, day, newValue)
     }
 
+    fun getDomicilioAsFlow(foglio: String, animatore: String) =
+        repository.getDomicilioAsFlow(foglio, animatore)
+
     fun updateDomicilio(foglio: String, animatore: String, value: String) = repository.updateDomicilio(foglio, animatore, value)
+
+    fun getNoteAsFlow(foglio: String, animatore: String) =
+        repository.getNoteAsFlow(foglio, animatore)
+
     fun updateNote(foglio: String, animatore: String, value: String) = repository.updateNote(foglio, animatore, value)
 
+    fun getAutoAsFlow(foglio: String, animatore: String) =
+        repository.getAutoAsFlow(foglio, animatore)
+
     fun updateAuto(foglio: String, animatore: String, value: Boolean) = repository.updateAuto(foglio, animatore, value)
+
+    fun getBambiniAsFlow(foglio: String, animatore: String) =
+        repository.getBambiniAsFlow(foglio, animatore)
+
     fun updateBambini(foglio: String, animatore: String, value: Boolean) = repository.updateBambini(foglio, animatore, value)
+
+    fun getAdultiAsFlow(foglio: String, animatore: String) =
+        repository.getAdultiAsFlow(foglio, animatore)
+
     fun updateAdulti(foglio: String, animatore: String, value: Boolean) = repository.updateAdulti(foglio, animatore, value)
 }
 

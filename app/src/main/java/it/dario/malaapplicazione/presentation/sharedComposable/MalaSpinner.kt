@@ -1,9 +1,11 @@
 package it.dario.malaapplicazione.presentation.sharedComposable
 
+import android.util.Log
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import it.dario.malaapplicazione.data.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -16,6 +18,8 @@ fun <T> MalaSpinner(
     selected: String?,
     initiallyExpanded: Boolean = false
 ) {
+
+    Log.d(Constants.TAG, "composing MalaSpinner for $label")
     var expanded by remember { mutableStateOf(initiallyExpanded) }
 
     ExposedDropdownMenuBox(

@@ -6,4 +6,10 @@
     <string name="indietro">indietro</string>
     <string name="seleziona_foglio">Seleziona il foglio</string>
     <string name="seleziona_animatore">Seleziona l\'animatore</string>
+
+    <string name="domicilio">Domicilio</string>
+    <string name="note">Note</string>
+    <string name="auto">Auto</string>
+    <string name="bambini">Bambini</string>
+    <string name="adulti">Note</string>
 </resources>

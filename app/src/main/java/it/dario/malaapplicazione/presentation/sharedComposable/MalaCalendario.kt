@@ -1,5 +1,6 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.domain.utils.rangeTo
 import java.text.DateFormatSymbols
 import java.time.LocalDate
@@ -27,6 +29,9 @@ fun MalaCalendario(
     endDate: LocalDate = LocalDate.of(2023, 9, 4),
     dayContent: @Composable (LocalDate) -> Unit = { PreviewDay(day = it)},
     ) {
+
+    Log.d(Constants.TAG, "composing MalaCalendario")
+
 
     val offsetItems = (0 until startDate.dayOfWeek.value-1).toList()
 

@@ -1,5 +1,6 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
@@ -34,6 +36,7 @@ fun GiornoInserisci(
     animatore: String
 ) {
 
+    Log.d(Constants.TAG, "composing GiornoInserisci for $day")
     val currentValue by viewModel.getDisponibilitaAsFlow(foglio, animatore, day).collectAsState()
 
     Box(
