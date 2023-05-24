@@ -120,9 +120,6 @@ fun AnimatoreData(
             val domicilioState by malaAnimatore.getDomicilioAsFlow().collectAsState()
             val noteState by malaAnimatore.getNoteAsFlow().collectAsState()
 
-            val autoState by malaAnimatore.getAutoAsFlow().collectAsState()
-            val bambiniState by malaAnimatore.getBambiniAsFlow().collectAsState()
-            val adultiState by malaAnimatore.getAdultiAsFlow().collectAsState()
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -139,21 +136,21 @@ fun AnimatoreData(
             )
 
             LabeledCheckbox(
-                checked = autoState,
+                toObserve = malaAnimatore.getAutoAsFlow(),
                 label = "AUTO",
                 onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
             )
 
             LabeledCheckbox(
-                checked = adultiState,
                 label = "ADULTI",
-                onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) }
+                onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
+                toObserve = malaAnimatore.getAdultiAsFlow()
             )
 
             LabeledCheckbox(
-                checked = bambiniState,
                 label = "BAMBINI",
-                onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) }
+                onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
+                toObserve = malaAnimatore.getBambiniAsFlow()
             )
         }
     }
