@@ -11,29 +11,25 @@ import java.time.LocalDate
 class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
 
 
-    private val _uiState: MutableStateFlow<InserisciUiState> =
-        MutableStateFlow(InserisciUiState(null, null))
-    val uiState: StateFlow<InserisciUiState> get() = _uiState.asStateFlow()
+    private val _foglioSelezionato: MutableStateFlow<String?> = MutableStateFlow(null)
+    var foglioSelezionato: StateFlow<String?> = _foglioSelezionato.asStateFlow()
 
-    var foglioSelezionato: String? = null
-    var animatoreSelezionato: String? = null
+    private val _animatoreSelezionato: MutableStateFlow<String?> = MutableStateFlow(null)
+    var animatoreSelezionato: StateFlow<String?> = _animatoreSelezionato.asStateFlow()
 
     val mesi = repository.getFogli()
 
     fun updateFoglioSelezionato(newValue: String) {
-        if (foglioSelezionato != newValue) {
-            foglioSelezionato = newValue
-            animatoreSelezionato = null
-            _uiState.value = (InserisciUiState(foglioSelezionato, animatoreSelezionato))
-        }
+            _foglioSelezionato.value = newValue
+            //TODO controllare se il nuovo foglio contiene l'animatore e nel caso mantenerlo selezionato?
+            // mi sembrerebbe un po' confusionario, risparmiando poi solo una selezione
+            _animatoreSelezionato.value = null
     }
 
     fun updateAnimatoreSelezionato(newValue: String) {
-        if (animatoreSelezionato != newValue) {
-            animatoreSelezionato = newValue
-            _uiState.value = (InserisciUiState(foglioSelezionato, animatoreSelezionato))
-        }
+        _animatoreSelezionato.value = newValue
     }
+
 
     fun getAnimatoriInFoglio(foglio: String): List<Animatore> {
         return repository.getAnimatori(foglio)

@@ -12,4 +12,6 @@
     <string name="auto">Auto</string>
     <string name="bambini">Bambini</string>
     <string name="adulti">Note</string>
+    <string name="inserisci_disponibilita_dialog">Inserisci disponibilità</string>
+    <string name="confirm">Conferma</string>
 </resources>
