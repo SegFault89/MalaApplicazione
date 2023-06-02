@@ -1,6 +1,7 @@
 package it.dario.malaapplicazione.data.model
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * Rappresenta un foglio dell'excel
@@ -18,7 +19,8 @@ data class Foglio(
     val meseInt: Int,
     val annoInt: Int,
     val primoGiorno: LocalDate,
-    val ultimoGiorno: LocalDate
+    val ultimoGiorno: LocalDate,
+    val dataAggiornamento: LocalDateTime = LocalDateTime.now()
 ) {
 
     /**
