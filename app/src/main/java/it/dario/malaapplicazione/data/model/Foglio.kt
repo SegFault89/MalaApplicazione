@@ -2,31 +2,22 @@ package it.dario.malaapplicazione.data.model
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 /**
  * Rappresenta un foglio dell'excel
  *
  * @param meseString il mese in formato stringa, come da nome del foglio
  * @param annoString l'anno in formato stringa, come da nome del foglio (le ultime due cifre)
- * @param meseInt il mese in formato numerico
- * @param annoInt l'anno in formato numerico
  * @param primoGiorno il primo giorno presente sul foglio
  * @param ultimoGiorno l'ultimo giorno compilabile sul file excel
  */
 data class Foglio(
-    val meseString: String,
-    val annoString: String,
-    val meseInt: Int,
-    val annoInt: Int,
+    val label: String,
     val primoGiorno: LocalDate,
     val ultimoGiorno: LocalDate,
     val dataAggiornamento: LocalDateTime = LocalDateTime.now()
 ) {
-
-    /**
-     * etichetta che verrà usata per mostrare il nome nello spinner
-     */
-    val label: String get() = "$meseString'$annoString"
 
     /**
      * gli animatori indicati nel foglio presenze
@@ -41,6 +32,11 @@ data class Foglio(
     fun addAnimatore(key: String, animatore: Animatore) {
         _animatori.put(key, animatore)
     }
+
+    fun getAnimatoriAsList() = animatori.values.toList()
+
+
+    val dayNum = ChronoUnit.DAYS.between(primoGiorno, ultimoGiorno) +1 // +1 per includere l'ultimo
 
 
 }

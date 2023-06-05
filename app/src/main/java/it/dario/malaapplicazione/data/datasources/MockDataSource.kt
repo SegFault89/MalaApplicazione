@@ -1,9 +1,11 @@
 package it.dario.malaapplicazione.data.datasources
 
+import android.content.Context
 import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.data.model.MalaFile
 import it.dario.malaapplicazione.domain.utils.LocalDateIterator
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -15,23 +17,25 @@ import java.time.Month
  */
 class MockDataSource : IDisponibilitaDataSource {
 
+
+    private val _isReady = MutableStateFlow(false)
+    override val isReady: StateFlow<Boolean>
+        get() = _isReady
+
+
     //region dati fittizi
-    val malaFile = MalaFile(fogli = listOf("Ottobre'23", "Novembre'23"))
+    val labelOttobre = "Ottobre '23"
+    val labelNovembre = "Novembre '23"
+    val malaFile = MalaFile(fogli = listOf(labelOttobre, labelNovembre))
 
     val foglioOttobre = Foglio(
-        meseString = "Ottobre",
-        annoString = "23",
-        meseInt = Month.OCTOBER.value,
-        annoInt = 2023,
+        label = labelOttobre,
         primoGiorno = LocalDate.of(2023, Month.OCTOBER.value, 1),
         ultimoGiorno = LocalDate.of(2023, Month.NOVEMBER.value, 1).minusDays(1)
     )
 
     val foglioNovembre = Foglio(
-        meseString = "Novembre",
-        annoString = "23",
-        meseInt = Month.NOVEMBER.value,
-        annoInt = 2023,
+        label = labelNovembre,
         primoGiorno = LocalDate.of(2023, Month.NOVEMBER.value, 1),
         ultimoGiorno = LocalDate.of(
             2023,
@@ -41,6 +45,7 @@ class MockDataSource : IDisponibilitaDataSource {
     )
 
     val darioOttobre = Animatore(
+        index = 1,
         nome = "Dario",
         cognome = "Trisconi",
         _domicilio = "Seregno",
@@ -50,6 +55,7 @@ class MockDataSource : IDisponibilitaDataSource {
         _note = "Datemidabbere"
     )
     val darioNovembre = Animatore(
+        index = 1,
         nome = "Dario",
         cognome = "Trisconi",
         _domicilio = "Seregno",
@@ -60,6 +66,7 @@ class MockDataSource : IDisponibilitaDataSource {
     )
 
     val silviaOttobre = Animatore(
+        index = 2,
         nome = "Silvia",
         cognome = "Ratti",
         _domicilio = "Seregno",
@@ -69,6 +76,7 @@ class MockDataSource : IDisponibilitaDataSource {
         _note = "Mai più ad Ancona"
     )
     val silviaNovembre = Animatore(
+        index = 2,
         nome = "Silvia",
         cognome = "Ratti",
         _domicilio = "Seregno",
@@ -79,9 +87,9 @@ class MockDataSource : IDisponibilitaDataSource {
     )
 
 
-    init {
+    override suspend fun setup(context: Context) {
         foglioOttobre.addAnimatore(silviaOttobre.label, silviaOttobre)
-        //foglioOttobre.addAnimatore(darioOttobre.label, darioOttobre)
+        foglioOttobre.addAnimatore(darioOttobre.label, darioOttobre)
 
         foglioNovembre.addAnimatore(silviaNovembre.label, silviaOttobre)
         foglioNovembre.addAnimatore(darioNovembre.label, darioOttobre)
@@ -102,14 +110,15 @@ class MockDataSource : IDisponibilitaDataSource {
                 if (it.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) "1" else "0"
             ) //dario solo i week end
         }
-    }
 
+        _isReady.value = true
+    }
     //endregion
 
     //private var foglioSelezionato: Foglio? = null
     override fun getFogli(): List<String> = malaFile.fogli
 
-    override fun getAnimatori(foglio: String): List<Animatore> =
+    override suspend fun getAnimatori(foglio: String): List<Animatore> =
         getFoglio(foglio).animatori.map { it.value }.toList()
 
 
@@ -137,24 +146,28 @@ class MockDataSource : IDisponibilitaDataSource {
         return getAnimatore(foglio, animatore).getNoteAsFlow()
     }
 
-    override fun updateDomicilio(foglio: String, animatore: String, value: String) {
+    override suspend fun updateDomicilio(foglio: String, animatore: String, value: String) {
         getAnimatore(foglio, animatore).updateDomicilio(value)
     }
 
-    override fun updateAuto(foglio: String, animatore: String, value: Boolean) {
+    override suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) {
         getAnimatore(foglio, animatore).updateAuto(value)
     }
 
-    override fun updateBambini(foglio: String, animatore: String, value: Boolean) {
+    override suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) {
         getAnimatore(foglio, animatore).updateBambini(value)
     }
 
-    override fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
+    override suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
         getAnimatore(foglio, animatore).updateAdulti(value)
     }
 
-    override fun updateNote(foglio: String, animatore: String, value: String) {
+    override suspend fun updateNote(foglio: String, animatore: String, value: String) {
         getAnimatore(foglio, animatore).updateNote(value)
+    }
+
+    override suspend fun refreshAnimatore(foglio: String, animatore: String) {
+        /*nothimg, nel mock non c'è bisogno di refresshare*/
     }
 
     override fun getFoglio(name: String): Foglio {
@@ -168,7 +181,7 @@ class MockDataSource : IDisponibilitaDataSource {
     override fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate): StateFlow<String> =
         getAnimatore(foglio, animatore)!!.getDisponibilitaAsFlow(date)
 
-    override fun setDisponibilita(
+    override suspend fun updateDisponibilita(
         foglio: String,
         animatore: String,
         date: LocalDate,

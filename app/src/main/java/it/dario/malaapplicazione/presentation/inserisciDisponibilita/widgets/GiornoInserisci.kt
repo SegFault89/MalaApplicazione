@@ -45,7 +45,7 @@ import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
 import it.dario.malaapplicazione.presentation.theme.DisponibileOrange
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle

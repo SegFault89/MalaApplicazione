@@ -23,32 +23,28 @@ import it.dario.malaapplicazione.presentation.datiFattura.DatiFattura
 import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModelFactory
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModel
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.MalaViewModelFactory
+import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModelFactory
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.VisualizzaDisponibilita
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val dataSource = //if (BuildConfig.MOCK_DATA) {
-        //MockDataSource()
-    //} else {
-        GoogleSheetDataSource(this)
-    //}
+    private val dataSource = if (BuildConfig.MOCK_DATA) {
+        MockDataSource()
+    } else {
+        GoogleSheetDataSource
+    }
 
-    /*
     private val viewModel: MalaViewModel by viewModels {
         MalaViewModelFactory(
             repository = DisponibilitaRepository(datasource = dataSource)
         )
-    }*/
+    }
     private val inserisciDisponibilitaViewModel: InserisciDisponibilitaViewModel by viewModels {
-        InserisciDisponibilitaViewModelFactory (
+        InserisciDisponibilitaViewModelFactory(
             repository = DisponibilitaRepository(datasource = dataSource)
         )
     }
@@ -56,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        CoroutineScope(IO).launch { dataSource.foobar() }
+        CoroutineScope(Dispatchers.IO).launch { dataSource.setup(baseContext) }
         setContent {
             MalaApplicazioneTheme {
                 // A surface container using the 'background' color from the theme
@@ -69,6 +65,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = HOME) {
                         composable(HOME) {
                             Home(
+                                viewModel = viewModel,
                                 onNavigateToInserisci = {
                                     navController.navigate(
                                         INSERISCI_DISPONIBILITA
@@ -79,17 +76,23 @@ class MainActivity : ComponentActivity() {
                                         VISUALIZZA_DISPONIBILITA
                                     )
                                 },
-                                onNavigateToDatiFattura = { navController.navigate(DATI_FATTURA) }
+                                onNavigateToDatiFattura = {
+                                    navController.navigate(
+                                        DATI_FATTURA
+                                    )
+                                }
                             )
                         }
                         composable(INSERISCI_DISPONIBILITA) {
                             InserisciDisponibilita(
                                 viewModel = inserisciDisponibilitaViewModel,
-                                navigateUp = navController::navigateUp)
+                                navigateUp = navController::navigateUp
+                            )
                         }
                         composable(VISUALIZZA_DISPONIBILITA) {
                             VisualizzaDisponibilita(
-                                navigateUp = navController::navigateUp)
+                                navigateUp = navController::navigateUp
+                            )
                         }
                         composable(DATI_FATTURA) { DatiFattura(navigateUp = navController::navigateUp) }
                     }

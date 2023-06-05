@@ -6,6 +6,9 @@ import it.dario.malaapplicazione.data.model.Foglio
 import java.time.LocalDate
 
 class DisponibilitaRepository (val datasource: IDisponibilitaDataSource) {
+
+    val isReady = datasource.isReady
+
     fun getFogli() : List<String>{
         return datasource.getFogli()
     }
@@ -14,7 +17,7 @@ class DisponibilitaRepository (val datasource: IDisponibilitaDataSource) {
         return datasource.getFoglio(nome)
     }
 
-    fun getAnimatori(foglio: String) : List<Animatore> {
+    suspend fun getAnimatori(foglio: String) : List<Animatore> {
         return datasource.getAnimatori(foglio)
     }
 
@@ -25,8 +28,8 @@ class DisponibilitaRepository (val datasource: IDisponibilitaDataSource) {
         datasource.getAnimatore(foglio, animatore)
 
 
-    fun setDisponibilita(foglio: String, animatore: String, date: LocalDate, content: String) =
-        datasource.setDisponibilita(foglio = foglio, animatore = animatore, date = date, content = content)
+    suspend fun setDisponibilita(foglio: String, animatore: String, date: LocalDate, content: String) =
+        datasource.updateDisponibilita(foglio = foglio, animatore = animatore, date = date, content = content)
 
     fun getDomicilioAsFlow(foglio: String, animatore: String) =
         datasource.getDomicilioAsFlow(foglio = foglio, animatore = animatore)
@@ -42,10 +45,14 @@ class DisponibilitaRepository (val datasource: IDisponibilitaDataSource) {
 
     fun getAutoAsFlow(foglio: String, animatore: String) =
         datasource.getAutoAsFlow(foglio = foglio, animatore = animatore)
-    fun updateDomicilio (foglio: String, animatore: String, value: String) = datasource.updateDomicilio(foglio, animatore, value)
-    fun updateAuto(foglio: String, animatore: String, value: Boolean) = datasource.updateAuto(foglio, animatore, value)
-    fun updateBambini (foglio: String, animatore: String, value: Boolean) = datasource.updateBambini(foglio, animatore, value)
-    fun updateAdulti (foglio: String, animatore: String, value: Boolean) = datasource.updateAdulti(foglio, animatore, value)
-    fun updateNote (foglio: String, animatore: String, value: String) = datasource.updateNote(foglio, animatore, value)
+    suspend fun updateDomicilio (foglio: String, animatore: String, value: String) = datasource.updateDomicilio(foglio, animatore, value)
+    suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) = datasource.updateAuto(foglio, animatore, value)
+    suspend fun updateBambini (foglio: String, animatore: String, value: Boolean) = datasource.updateBambini(foglio, animatore, value)
+    suspend fun updateAdulti (foglio: String, animatore: String, value: Boolean) = datasource.updateAdulti(foglio, animatore, value)
+    suspend fun updateNote (foglio: String, animatore: String, value: String) = datasource.updateNote(foglio, animatore, value)
+
+    suspend fun refreshAnimatore(foglio: String, animatore: String) {
+        datasource.refreshAnimatore(foglio, animatore)
+    }
 
 }

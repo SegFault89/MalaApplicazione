@@ -9,15 +9,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
+import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.home.widgets.HomeButton
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
+import it.dario.malaapplicazione.presentation.MalaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
+    viewModel: MalaViewModel,
     onNavigateToInserisci: () -> Unit = {},
     onNavigateToVisualizza: () -> Unit = {},
-    onNavigateToDatiFattura: () -> Unit = {},
+    onNavigateToDatiFattura: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -29,6 +33,7 @@ fun Home(
         }) { contentPadding ->
         Row(
             modifier = Modifier
+                .padding(contentPadding)
                 .fillMaxSize(),
             horizontalArrangement = Arrangement.Center
         )
@@ -44,12 +49,14 @@ fun Home(
                 HomeButton(
                     modifier = buttonModifier,
                     label = stringResource(id = R.string.inserisci_disponibilita),
-                    onclick = onNavigateToInserisci
+                    onclick = onNavigateToInserisci,
+                    enabled = viewModel.isReady
                 )
                 HomeButton(
                     modifier = buttonModifier,
                     label = stringResource(id = R.string.visualizza_disponibilita),
-                    onclick = onNavigateToVisualizza
+                    onclick = onNavigateToVisualizza,
+                    enabled = viewModel.isReady
                 )
                 HomeButton(
                     modifier = buttonModifier,
@@ -65,7 +72,7 @@ fun Home(
 @Composable
 fun HomeLightPreview() {
     MalaApplicazioneTheme {
-        Home()
+        Home(viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())))
     }
 }
 
@@ -73,6 +80,6 @@ fun HomeLightPreview() {
 @Composable
 fun HomeDarkPreview() {
     MalaApplicazioneTheme {
-        Home()
+        Home(viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())))
     }
 }

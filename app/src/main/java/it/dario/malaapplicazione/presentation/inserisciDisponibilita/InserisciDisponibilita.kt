@@ -1,31 +1,22 @@
 package it.dario.malaapplicazione.presentation.inserisciDisponibilita
 
 import android.util.Log
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
-import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.GiornoInserisci
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.MalaCalendario
@@ -35,7 +26,6 @@ import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
 import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
 
 @Composable
 fun InserisciDisponibilita(
@@ -63,7 +53,6 @@ fun Content(
 
     val currentFoglio by viewModel.foglioSelezionato.collectAsState()
     val currentAnimatore by viewModel.animatoreSelezionato.collectAsState()
-
 
     LazyColumn(
         modifier = modifier
@@ -97,6 +86,8 @@ fun SpinnerSection(
     animatore: String?,
 ) {
 
+    val foglioLoading by viewModel.loadingFoglio.collectAsState()
+
     // Spinner foglio
     MalaSpinner(
         modifier = spinnerModifier,
@@ -109,17 +100,22 @@ fun SpinnerSection(
 
     //spinner animatore
     if (!foglio.isNullOrEmpty()) {
-        MalaSpinner(
-            modifier = spinnerModifier,
-            label = stringResource(id = R.string.seleziona_animatore),
-            options = viewModel.getAnimatoriInFoglio(foglio),
-            getOptionLabel = { a -> a.label },
-            onItemSelected = { viewModel.updateAnimatoreSelezionato(it.label) },
-            selected = animatore
-        )
+        if (foglioLoading) {
+            //se sto caricando
+            CircularProgressIndicator()
+        } else {
+            //se ho caricato
+            MalaSpinner(
+                modifier = spinnerModifier,
+                label = stringResource(id = R.string.seleziona_animatore),
+                options = viewModel.listAnimatori,
+                getOptionLabel = { a -> a.label },
+                onItemSelected = { viewModel.updateAnimatoreSelezionato(it.label) },
+                selected = animatore
+            )
+        }
     }
 }
-
 
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -131,7 +127,12 @@ fun AnimatoreData(
 ) {
 
     Log.d(Constants.TAG, "composing AnimatoreData")
-
+    val animatoreLoading by viewModel.loadingAnimatore.collectAsState()
+    if (animatoreLoading) {
+        //se sto caricando
+        CircularProgressIndicator()
+    } else {
+        //Se ho caricato
         MalaCalendario(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,36 +150,36 @@ fun AnimatoreData(
         )
 
 
-    MalaOutlinedTextBox(
-        modifier = Modifier.fillMaxWidth(),
-        label = stringResource(id = R.string.domicilio),
-        toObserve = viewModel.getDomicilioAsFlow(foglio, animatore),
-        onValueChangeListener = { viewModel.updateDomicilio(foglio, animatore, it) })
+        MalaOutlinedTextBox(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(id = R.string.domicilio),
+            toObserve = viewModel.getDomicilioAsFlow(foglio, animatore),
+            onValueChangeListener = { viewModel.updateDomicilio(foglio, animatore, it) })
 
-    MalaOutlinedTextBox(
-        modifier = Modifier.fillMaxWidth(),
-        label = stringResource(id = R.string.note),
-        toObserve = viewModel.getNoteAsFlow(foglio, animatore),
-        onValueChangeListener = { viewModel.updateNote(foglio, animatore, it) })
+        MalaOutlinedTextBox(
+            modifier = Modifier.fillMaxWidth(),
+            label = stringResource(id = R.string.note),
+            toObserve = viewModel.getNoteAsFlow(foglio, animatore),
+            onValueChangeListener = { viewModel.updateNote(foglio, animatore, it) })
 
-    LabeledCheckbox(
-        toObserve = viewModel.getAutoAsFlow(foglio, animatore),
-        label = stringResource(id = R.string.auto),
-        onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
-    )
+        LabeledCheckbox(
+            toObserve = viewModel.getAutoAsFlow(foglio, animatore),
+            label = stringResource(id = R.string.auto),
+            onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
+        )
 
-    LabeledCheckbox(
-        label = stringResource(id = R.string.adulti),
-        onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
-        toObserve = viewModel.getAdultiAsFlow(foglio, animatore)
-    )
+        LabeledCheckbox(
+            label = stringResource(id = R.string.adulti),
+            onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
+            toObserve = viewModel.getAdultiAsFlow(foglio, animatore)
+        )
 
-    LabeledCheckbox(
-        label = stringResource(id = R.string.bambini),
-        onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
-        toObserve = viewModel.getBambiniAsFlow(foglio, animatore)
-    )
-
+        LabeledCheckbox(
+            label = stringResource(id = R.string.bambini),
+            onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
+            toObserve = viewModel.getBambiniAsFlow(foglio, animatore)
+        )
+    }
 }
 
 

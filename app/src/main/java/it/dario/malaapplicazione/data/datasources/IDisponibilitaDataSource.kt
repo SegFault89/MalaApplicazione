@@ -16,7 +16,7 @@ sealed interface IDisponibilitaDataSource {
     /**
      * restituisce una lista dei fogli presenti sul file
      */
-    suspend fun getFogli() : List<String>
+    fun getFogli() : List<String>
 
     /**
      * restituisce una lista degli animatori presenti nel foglio indicato
@@ -24,7 +24,6 @@ sealed interface IDisponibilitaDataSource {
     suspend fun getAnimatori(foglio: String): List<Animatore>
     fun getFoglio(name: String): Foglio
     fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate): StateFlow<String>
-    fun setDisponibilita(foglio: String, animatore: String, date: LocalDate, content: String)
     fun getAnimatore(foglio: String, animatore: String): Animatore
 
     fun getDomicilioAsFlow(foglio: String, animatore: String): StateFlow<String>
@@ -33,10 +32,14 @@ sealed interface IDisponibilitaDataSource {
     fun getAdultiAsFlow (foglio: String, animatore: String): StateFlow<Boolean>
     fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String>
 
-    fun updateDomicilio (foglio: String, animatore: String, value: String)
-    fun updateAuto(foglio: String, animatore: String, value: Boolean)
-    fun updateBambini (foglio: String, animatore: String, value: Boolean)
-    fun updateAdulti (foglio: String, animatore: String, value: Boolean)
-    fun updateNote (foglio: String, animatore: String, value: String)
+    suspend fun updateDisponibilita(foglio: String, animatore: String, date: LocalDate, content: String)
+    suspend fun updateDomicilio (foglio: String, animatore: String, value: String)
+    suspend fun updateAuto(foglio: String, animatore: String, value: Boolean)
+    suspend fun updateBambini (foglio: String, animatore: String, value: Boolean)
+    suspend fun updateAdulti (foglio: String, animatore: String, value: Boolean)
+    suspend fun updateNote (foglio: String, animatore: String, value: String)
 
+    suspend fun refreshAnimatore(foglio: String, animatore: String)
+
+    suspend fun setup(context: Context)
 }
