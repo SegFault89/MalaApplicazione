@@ -22,10 +22,12 @@ import it.dario.malaapplicazione.presentation.PresentationConstants.VISUALIZZA_D
 import it.dario.malaapplicazione.presentation.datiFattura.DatiFattura
 import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilita
-import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModelFactory
 import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.VisualizzaDisponibilita
+import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.VisualizzaDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.VisualizzaDisponibilitaViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +47,12 @@ class MainActivity : ComponentActivity() {
     }
     private val inserisciDisponibilitaViewModel: InserisciDisponibilitaViewModel by viewModels {
         InserisciDisponibilitaViewModelFactory(
+            repository = DisponibilitaRepository(datasource = dataSource)
+        )
+    }
+
+    private val visualizzaDisponibilitaViewModel: VisualizzaDisponibilitaViewModel by viewModels {
+        VisualizzaDisponibilitaViewModelFactory(
             repository = DisponibilitaRepository(datasource = dataSource)
         )
     }
@@ -91,6 +99,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(VISUALIZZA_DISPONIBILITA) {
                             VisualizzaDisponibilita(
+                                viewModel = visualizzaDisponibilitaViewModel,
                                 navigateUp = navController::navigateUp
                             )
                         }

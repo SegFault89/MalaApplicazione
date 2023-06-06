@@ -27,4 +27,8 @@ data class MalaFile(
         }
     }
 
+    fun updateFoglio(foglio: Foglio) {
+        _malaFogli[foglio.label] = foglio
+    }
+
 }

@@ -16,7 +16,7 @@ data class Foglio(
     val label: String,
     val primoGiorno: LocalDate,
     val ultimoGiorno: LocalDate,
-    val dataAggiornamento: LocalDateTime = LocalDateTime.now()
+    val dataAggiornamento: LocalDateTime = LocalDateTime.now().minusDays(1)
 ) {
 
     /**

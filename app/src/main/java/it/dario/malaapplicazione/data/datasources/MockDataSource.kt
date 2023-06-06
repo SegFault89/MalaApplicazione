@@ -113,12 +113,13 @@ class MockDataSource : IDisponibilitaDataSource {
 
         _isReady.value = true
     }
+
     //endregion
 
     //private var foglioSelezionato: Foglio? = null
     override fun getFogli(): List<String> = malaFile.fogli
 
-    override suspend fun getAnimatori(foglio: String): List<Animatore> =
+    override suspend fun fetchAnimatoriInFoglio(foglio: String, complete: Boolean): List<Animatore> =
         getFoglio(foglio).animatori.map { it.value }.toList()
 
 

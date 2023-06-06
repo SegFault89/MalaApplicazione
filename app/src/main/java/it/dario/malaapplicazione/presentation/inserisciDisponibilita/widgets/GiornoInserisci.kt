@@ -42,10 +42,10 @@ import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
-import it.dario.malaapplicazione.presentation.theme.DisponibileOrange
-import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -99,8 +99,8 @@ fun GiornoInserisci(
                 containerColor = when (currentValue) {
                     NON_DISPONIBILE -> DisponibileRed
                     DISPONIBILE -> DisponibileGreen
-                    NO_DISPONIBILITA -> DisponibileOrange
-                    else -> DisponibileOrange
+                    NO_DISPONIBILITA -> DisponibileYellow
+                    else -> DisponibileYellow
                 },
             ),
         ) {
@@ -114,8 +114,6 @@ fun GiornoInserisci(
 
     // Sheet content
     if (openDialog) {
-        var newDisponibilita = currentValue
-
         CustomAlertDialog(
             day = day,
             disponibilita = currentValue,
@@ -167,7 +165,7 @@ fun CustomAlertDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
                 TextButton(
-                    onClick = {saveValue(value); dismiss() },
+                    onClick = { saveValue(value); dismiss() },
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(stringResource(id = R.string.confirm))

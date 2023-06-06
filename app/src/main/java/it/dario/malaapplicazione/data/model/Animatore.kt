@@ -1,6 +1,9 @@
 package it.dario.malaapplicazione.data.model
 
+import it.dario.malaapplicazione.data.Constants.DISPONIBILE
+import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
+import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -124,6 +127,15 @@ data class Animatore(
     fun updateNote (value: String) {
         _note = value
         noteFlow.value = value
+    }
+
+    fun getTipoDisponibilita(date: LocalDate) : DisponibilitaEnum {
+        return when (getDisponibilita(date)) {
+            DISPONIBILE -> DisponibilitaEnum.DISPONIBILE
+            NO_DISPONIBILITA,
+            NON_DISPONIBILE -> DisponibilitaEnum.NON_DISPONIBILE
+            else -> DisponibilitaEnum.ALTRO
+        }
     }
 
 }
