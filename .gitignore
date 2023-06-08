@@ -31,3 +31,5 @@ google-services.json
 
 # Android Profiling
 *.hprof
+/app/src/main/res/raw/credential_secret.json
+/app/src/main/java/it/dario/malaapplicazione/data/secret*

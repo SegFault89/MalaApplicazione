@@ -36,7 +36,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomAlertDialog(
+fun InsertDisponibilitaDialog(
     day: LocalDate,
     disponibilita: String,
     saveValue: (String) -> Unit,
@@ -87,7 +87,7 @@ fun CustomAlertDialog(
 @Composable
 fun DialogPreview() {
     val mock = MockDataSource()
-    CustomAlertDialog(
+    InsertDisponibilitaDialog(
         day = mock.foglioNovembre.ultimoGiorno,
         disponibilita = "dalle 18:00",
         saveValue = {},

@@ -7,6 +7,10 @@ object PresentationConstants {
     const val INSERISCI_DISPONIBILITA = "inserisci_disponibilita"
     const val VISUALIZZA_DISPONIBILITA = "visualizza_disponibilita"
     const val DATI_FATTURA = "dati_fattura"
+    const val ERROR_DIALOG= "error_dialog"
     //endregion
+
+
+    const val ERROR_MESSAGE_ID = "messageId"
 
 }

@@ -50,7 +50,7 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
 
     private fun fetchAnimatoriInFoglio(foglio: String) = CoroutineScope(IO).launch {
         _loadingFoglio.value = true
-        listAnimatori = repository.fetchAnimatori(foglio)
+        listAnimatori = repository.fetchAnimatori(foglio).sortedBy { it.label }
         _loadingFoglio.value = false
     }
 

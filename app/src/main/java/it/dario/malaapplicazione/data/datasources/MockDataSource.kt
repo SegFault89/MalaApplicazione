@@ -21,8 +21,10 @@ class MockDataSource : IDisponibilitaDataSource {
     private val _isReady = MutableStateFlow(false)
     override val isReady: StateFlow<Boolean>
         get() = _isReady
-    override var errorHandler: IDatasourceErrorHandler? = null
 
+    override fun setErrorHandler(e: IDatasourceErrorHandler) {
+        /* nothing, non serve per il mock */
+    }
 
     //region dati fittizi
     val labelOttobre = "Ottobre '23"

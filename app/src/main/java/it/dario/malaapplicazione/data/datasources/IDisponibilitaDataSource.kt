@@ -18,11 +18,8 @@ sealed interface IDisponibilitaDataSource {
     /**
      * setuppa un handler per permettere di eseguire azioni a fronte di un errore (esempio: mostrare un messaggio)
      */
-    var errorHandler: IDatasourceErrorHandler?
 
-    fun setErrorHandler(e: IDatasourceErrorHandler) {
-        errorHandler = e
-    }
+    fun setErrorHandler(e: IDatasourceErrorHandler)
 
     /**
      * restituisce una lista dei fogli presenti sul file

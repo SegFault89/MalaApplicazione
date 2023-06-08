@@ -59,8 +59,12 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     private val _isReady = MutableStateFlow(false)
     override val isReady: StateFlow<Boolean>
         get() = _isReady
-    
-    override var errorHandler: IDatasourceErrorHandler? = null
+
+    /**
+     * setuppa un handler per permettere di eseguire azioni a fronte di un errore (esempio: mostrare un messaggio)
+     */
+    private var errorHandler: IDatasourceErrorHandler? = null
+
 
     private lateinit var service: Sheets
 
@@ -80,6 +84,10 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         malaFile = MalaFile(fogli = getSheets())
 
         _isReady.value = true
+    }
+
+    override fun setErrorHandler(e: IDatasourceErrorHandler) {
+        errorHandler = e
     }
 
     private fun getSheets(): List<String> =
@@ -186,7 +194,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
         val giorniNelFoglio = getGiorni(name)
 
-            Log.d(TAG, "Numero giorni = ${(giorniNelFoglio.getValues().first().size)}")
+        Log.d(TAG, "Numero giorni = ${(giorniNelFoglio.getValues().first().size)}")
 
         val splitted = name.split(FILE_NAME_SEPARATOR)
 
@@ -196,13 +204,13 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         val primoGiorno =
             LocalDate.of(
                 BASE_YEAR + splitted[1].toInt(),
-                mapMonth[first[1].lowercase()]!!,
+                mapMonth[first[1].lowercase().trim()]!!,
                 first[0].toInt()
             )
         val ultimoGiorno =
             LocalDate.of(
                 BASE_YEAR + splitted[1].toInt(),
-                mapMonth[last[1].lowercase()]!!,
+                mapMonth[last[1].lowercase().trim()]!!,
                 last[0].toInt()
             )
 

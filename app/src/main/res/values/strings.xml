@@ -29,4 +29,12 @@
     <string name="indirizzo_value">Via Agnelli 19, 21013 Gallarate VA IT</string>
     <string name="codiceDestinatario">Codice Destinatario</string>
     <string name="codiceDestinatario_value">KRRH6B9</string>
+    <string name="get_fogli_error">Errore durante il primo download dei fogli, provare a chiudere e riaprire l\'applicazione.\nSe l\'errore persiste, contattate Dario</string>
+    <string name="get_animatori_error">Errore durante il download degli animatori, provare a chiudere e riaprire l\'applicazione.\nSe l\'errore persiste, contattate Dario</string>
+    <string name="get_animatori_complete_error">Errore durante il download delle informazioni del foglio, provare a chiudere e riaprire l\'applicazione.\nSe l\'errore persiste, contattate Dario</string>
+    <string name="get_giorni_error">Errore durante il recupero dei giorni, provare a chiudere e riaprire l\'applicazione.\nSe l\'errore persiste, contattate Dario</string>
+    <string name="get_animatore_error">Errore durante il download dell\'animatore, provare a chiudere e riaprire l\'applicazione.\nSe l\'errore persiste, contattate Dario</string>
+    <string name="update_cell_error">Errore durante l\'aggiornamento dei dati.\n\nATTENZIONE POTREBBE NON ESSERE PIU\' ALLINEATO CON L\'EXCEL.\n\nSe l\'errore persiste, contattate Dario</string>
+    <string name="attenzione">Attenzione</string>
+    <string name="generic_error">Errore generico....\nChe dire.......\nBoh.......</string>
 </resources>

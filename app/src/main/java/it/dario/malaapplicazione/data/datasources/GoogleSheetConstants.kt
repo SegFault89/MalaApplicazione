@@ -31,9 +31,9 @@ object GoogleSheetConstants {
 
     const val RIGA_GIORNI = "$INDICE_COLONNA_PRIMO_GIORNO$INDICE_RIGA_GIORNI:$INDICE_RIGA_GIORNI"
 
-    const val FILE_NAME_SEPARATOR = " '"
+    const val FILE_NAME_SEPARATOR = "'"
 
-    const val FILENAME_PATTERN = """^.* '\d{2}$"""
+    const val FILENAME_PATTERN = """^.*'\d{2}$"""
     val FILENAME_REGEX = Regex(FILENAME_PATTERN)
 
     const val BASE_YEAR = 2000
