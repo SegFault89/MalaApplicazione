@@ -1,4 +1,4 @@
-package it.dario.malaapplicazione.presentation.inserisciDisponibilita
+package it.dario.malaapplicazione.presentation.inseriscidisponibilita
 
 import android.util.Log
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -17,13 +17,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
-import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.GiornoInserisci
-import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.MalaCalendario
-import it.dario.malaapplicazione.presentation.sharedComposable.LabeledCheckbox
-import it.dario.malaapplicazione.presentation.sharedComposable.MalaOutlinedTextBox
-import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
-import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets.GiornoInserisci
+import it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets.MalaCalendario
+import it.dario.malaapplicazione.presentation.sharedcomposable.LabeledCheckbox
+import it.dario.malaapplicazione.presentation.sharedcomposable.MalaOutlinedTextBox
+import it.dario.malaapplicazione.presentation.sharedcomposable.MalaScaffold
+import it.dario.malaapplicazione.presentation.sharedcomposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
 

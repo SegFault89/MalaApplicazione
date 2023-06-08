@@ -1,5 +1,9 @@
-package it.dario.malaapplicazione.data.repositories
+package it.dario.malaapplicazione.domain.repositories
 
+import android.util.Log
+import it.dario.malaapplicazione.data.Constants
+import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
+import it.dario.malaapplicazione.data.Constants.TAG
 import it.dario.malaapplicazione.data.datasources.GoogleSheetDataSource
 import it.dario.malaapplicazione.data.datasources.IDisponibilitaDataSource
 import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
@@ -87,6 +91,17 @@ class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
             r[DisponibilitaEnum.NON_DISPONIBILE] ?: 0,
             r[DisponibilitaEnum.ALTRO] ?: 0
         )
+    }
+
+    fun getAnimatoriDisponibili(foglio: String?, day: LocalDate?): List<Animatore> {
+        if (foglio == null || day == null) {
+            Log.w(TAG, "sto provando a recuperare la lista di animatori disponibili con foglio o giorno nullo")
+            return listOf()
+        }
+        return datasource.getFoglio(foglio).animatori.values
+            .filter { it.getTipoDisponibilita(day) != DisponibilitaEnum.NON_DISPONIBILE }
+            .toList()
+            .sortedByDescending { it.getTipoDisponibilita(day).ordinal }.toList() //TODO rendere un po' più preciso
     }
 
 

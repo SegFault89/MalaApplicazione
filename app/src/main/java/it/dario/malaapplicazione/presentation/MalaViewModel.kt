@@ -2,7 +2,7 @@ package it.dario.malaapplicazione.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import kotlinx.coroutines.flow.*
 
 class MalaViewModel (val repository: DisponibilitaRepository) : ViewModel() {

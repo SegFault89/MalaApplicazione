@@ -3,6 +3,7 @@ package it.dario.malaapplicazione.data.model
 import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
+import it.dario.malaapplicazione.data.IdGenerator
 import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +32,7 @@ data class Animatore(
     private var _adulti: Boolean = false,
     private var _note: String = "",
     var dataAggiornamento: LocalDateTime = LocalDateTime.now().minusDays(1), //appena un animatore viene creato, lo considero "vecchio" in modo da aggiornalo quando serve
+    val id: Int = IdGenerator.getNext
 ) {
 
     //duplicate per mantenere il set priivato

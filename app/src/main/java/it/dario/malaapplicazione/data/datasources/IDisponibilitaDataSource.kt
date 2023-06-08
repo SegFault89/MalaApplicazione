@@ -14,6 +14,16 @@ sealed interface IDisponibilitaDataSource {
      */
     val isReady: StateFlow<Boolean>
 
+
+    /**
+     * setuppa un handler per permettere di eseguire azioni a fronte di un errore (esempio: mostrare un messaggio)
+     */
+    var errorHandler: IDatasourceErrorHandler?
+
+    fun setErrorHandler(e: IDatasourceErrorHandler) {
+        errorHandler = e
+    }
+
     /**
      * restituisce una lista dei fogli presenti sul file
      */

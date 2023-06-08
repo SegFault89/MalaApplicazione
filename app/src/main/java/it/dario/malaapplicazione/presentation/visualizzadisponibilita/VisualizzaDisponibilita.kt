@@ -1,11 +1,15 @@
-package it.dario.malaapplicazione.presentation.visualizzaDisponibilita
+package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,14 +21,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
-import it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets.MalaCalendario
-import it.dario.malaapplicazione.presentation.sharedComposable.MalaScaffold
-import it.dario.malaapplicazione.presentation.sharedComposable.MalaSpinner
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets.MalaCalendario
+import it.dario.malaapplicazione.presentation.sharedcomposable.MalaScaffold
+import it.dario.malaapplicazione.presentation.sharedcomposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.Others.spinnerModifier
 import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.widgets.GiornoVisualizza
+import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.AnimatoreListItem
+import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.GiornoVisualizza
 
 @Composable
 fun VisualizzaDisponibilita(
@@ -59,11 +64,11 @@ fun Content(
             foglio = currentFoglio,
         )
 
-    if (currentFoglio != null) {
-        DisponibilitaData(
-            viewModel = viewModel,
-            foglio = currentFoglio!!,
-        )
+        if (currentFoglio != null) {
+            DisponibilitaData(
+                viewModel = viewModel,
+                foglio = currentFoglio!!,
+            )
         }
     }
 }
@@ -86,7 +91,6 @@ fun SpinnerSection(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DisponibilitaData(
     viewModel: VisualizzaDisponibilitaViewModel,
@@ -95,6 +99,7 @@ fun DisponibilitaData(
 
     Log.d(Constants.TAG, "composing DisponibilitaData")
     val foglioIsLoading by viewModel.loadingFoglio.collectAsState()
+
     if (foglioIsLoading) {
         //se sto caricando
         CircularProgressIndicator()
@@ -111,10 +116,35 @@ fun DisponibilitaData(
                     viewModel = viewModel,
                     day = it,
                     foglio = foglio,
-                    onDaySelected = {} //TODO
                 )
             }
         )
+
+        AnimatoriList(viewModel = viewModel, foglio)
+    }
+}
+
+@Composable
+fun AnimatoriList(
+    viewModel: VisualizzaDisponibilitaViewModel,
+    foglioSelezionato: String
+) {
+    val giornoSelezionato by viewModel.giornoSelezionato.collectAsState()
+
+
+    giornoSelezionato?.let { giorno ->
+        val lst = viewModel.getAnimatoriDisponibili(foglioSelezionato, giorno).toList()
+
+        LazyColumn(modifier = Modifier.padding(MarginNormal),
+            verticalArrangement = Arrangement.spacedBy(VerticalSpacingNormal),
+            state = LazyListState(0)) {
+            items(lst, key = {(it.id*100)+giorno.dayOfMonth}) {
+                AnimatoreListItem(
+                    animatore = it,
+                    giornoSelezionato = giorno
+                )
+            }
+        }
     }
 }
 

@@ -33,11 +33,7 @@ import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.RAW
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.RIGA_GIORNI
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.getRigheAnimatoriCoompleti
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.mapMonth
-import it.dario.malaapplicazione.data.enums.DisponibilitaEnum.ALTRO
-import it.dario.malaapplicazione.data.enums.DisponibilitaEnum.DISPONIBILE
-import it.dario.malaapplicazione.data.enums.DisponibilitaEnum.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.data.model.Foglio
 import it.dario.malaapplicazione.data.model.MalaFile
 import it.dario.malaapplicazione.data.secret.Secret.GOOLE_SPREADSHEET
@@ -63,6 +59,8 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     private val _isReady = MutableStateFlow(false)
     override val isReady: StateFlow<Boolean>
         get() = _isReady
+    
+    override var errorHandler: IDatasourceErrorHandler? = null
 
     private lateinit var service: Sheets
 
@@ -85,16 +83,28 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     }
 
     private fun getSheets(): List<String> =
-        service.spreadsheets()[GOOLE_SPREADSHEET].apply { includeGridData = false }
-            .execute().sheets.map { it.properties.title }.filter { FILENAME_REGEX.matches(it) }
-            .toList()
+        try {
+            service.spreadsheets()[GOOLE_SPREADSHEET].apply { includeGridData = false }
+                .execute().sheets.map { it.properties.title }.filter { FILENAME_REGEX.matches(it) }
+                .toList()
+        } catch (t: Throwable) {
+            errorHandler?.onGetFogliError(t)
+            listOf()
+        }
 
     override fun getFogli(): List<String> = malaFile.fogli
 
+    private fun getRangeNomiCognomiAnimatori(foglio: String): ValueRange = try {
+        service.spreadsheets()
+            .values()[GOOLE_SPREADSHEET, "$foglio!$COLONNE_NOME_COGNOME_ANIMATORI"].execute()
+    } catch (t: Throwable) {
+        errorHandler?.onGetAnimatoriError(t)
+        ValueRange()
+    }
+
     private fun fetchAnimatori(foglio: String): List<Animatore> {
         val result = mutableListOf<Animatore>()
-        val response: ValueRange = service.spreadsheets()
-            .values()[GOOLE_SPREADSHEET, "$foglio!$COLONNE_NOME_COGNOME_ANIMATORI"].execute()
+        val response: ValueRange = getRangeNomiCognomiAnimatori(foglio)
         Log.d(TAG, "animatori trovati per $foglio -> ${response.getValues().size}")
         response.getValues().forEachIndexed { i, v ->
             try {
@@ -112,12 +122,20 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         return result
     }
 
+    private fun getRangeNomiCognomiAnimatoriComplete(foglio: String, noteIndex: Int): ValueRange =
+        try {
+            service.spreadsheets()
+                .values()[GOOLE_SPREADSHEET, "$foglio!${getRigheAnimatoriCoompleti(indiceNote = noteIndex)}"].execute()
+        } catch (t: Throwable) {
+            errorHandler?.onGetAnimatoriCompleteError(t)
+            ValueRange()
+        }
+
     private fun fetchAnimatoriComplete(foglio: String, sheet: Foglio): List<Animatore> {
         val result = mutableListOf<Animatore>()
         val indiceNote = INDICE_COLONNA_PRIMO_GIORNO_INT + sheet.dayNum.toInt()
 
-        val response: ValueRange = service.spreadsheets()
-            .values()[GOOLE_SPREADSHEET, "$foglio!${getRigheAnimatoriCoompleti(indiceNote = indiceNote)}"].execute()
+        val response: ValueRange = getRangeNomiCognomiAnimatoriComplete(foglio, indiceNote)
         Log.d(TAG, "animatori trovati per $foglio -> ${response.getValues().size}")
         response.getValues().forEachIndexed { i, v ->
             lateinit var anim: Animatore
@@ -137,240 +155,254 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                     } else {
                         v[indiceNote - 1].toString()
                     }
-            )
-        } catch (t: Throwable) {
-            Log.d(TAG, "Sembra non esserci nome o cognome per la riga $i frl foglio $foglio")
-            return@forEachIndexed
+                )
+            } catch (t: Throwable) {
+                Log.d(TAG, "Sembra non esserci nome o cognome per la riga $i nel foglio $foglio")
+                return@forEachIndexed
+            }
+            v.forEachIndexed { index, value ->
+                if (index < INDICE_COLONNA_PRIMO_GIORNO_INT - 1) {
+                    /* nothing */
+                } else {
+                    anim.setDisponibilita(
+                        sheet.primoGiorno.plusDays((index + 1 - INDICE_COLONNA_PRIMO_GIORNO_INT).toLong()),
+                        value?.toString() ?: NO_DISPONIBILITA
+                    )
+                }
+            }
+            result.add(anim)
         }
-        v.forEachIndexed { index, value ->
-            if (index < INDICE_COLONNA_PRIMO_GIORNO_INT - 1) {
-                /* nothing */
-            } else {
-                anim.setDisponibilita(
-                    sheet.primoGiorno.plusDays((index +1 -INDICE_COLONNA_PRIMO_GIORNO_INT).toLong()),
-                    value?.toString() ?:
-                    NO_DISPONIBILITA
+        return result
+    }
+
+    private fun getGiorni(foglio: String) = try {
+        service.spreadsheets().values()[GOOLE_SPREADSHEET, "$foglio!$RIGA_GIORNI"].execute()
+    } catch (t: Throwable) {
+        errorHandler?.onGetGiorniError(t)
+        ValueRange()
+    }
+
+    fun fetchFoglio(name: String, complete: Boolean = false): Foglio {
+
+        val giorniNelFoglio = getGiorni(name)
+
+            Log.d(TAG, "Numero giorni = ${(giorniNelFoglio.getValues().first().size)}")
+
+        val splitted = name.split(FILE_NAME_SEPARATOR)
+
+        val first = giorniNelFoglio.getValues().first().first().toString().split(" ")
+        val last = giorniNelFoglio.getValues().first().last().toString().split(" ")
+
+        val primoGiorno =
+            LocalDate.of(
+                BASE_YEAR + splitted[1].toInt(),
+                mapMonth[first[1].lowercase()]!!,
+                first[0].toInt()
+            )
+        val ultimoGiorno =
+            LocalDate.of(
+                BASE_YEAR + splitted[1].toInt(),
+                mapMonth[last[1].lowercase()]!!,
+                last[0].toInt()
+            )
+
+        val result = Foglio(
+            label = name,
+            primoGiorno = primoGiorno,
+            ultimoGiorno = ultimoGiorno,
+            dataAggiornamento = LocalDateTime.now()
+        )
+        if (complete) {
+            fetchAnimatoriComplete(name, result)
+        } else {
+            fetchAnimatori(name)
+        }.forEach { result.addAnimatore(it.label, it) }
+        return result
+    }
+
+    override suspend fun fetchAnimatoriInFoglio(
+        foglio: String,
+        complete: Boolean
+    ): List<Animatore> {
+        //controllo se il foglio esiste già nel malaFIle, altrimento lo scarico e lo aggiungo al file
+        val mFoglio =
+            malaFile.malaFogli[foglio] ?: fetchFoglio(
+                foglio,
+                complete
+            ).also { malaFile.addFoglio(it) }
+
+        if (complete && LocalDateTime.now().minusMinutes(30).isBefore(mFoglio.dataAggiornamento)) {
+            malaFile.updateFoglio(fetchFoglio(foglio, true))
+        }
+        return mFoglio.getAnimatoriAsList()
+
+    }
+
+    private fun getAnimatoreCompleto(foglio: String, rowIndex: Int) = try {
+        service.spreadsheets()
+            .values()[GOOLE_SPREADSHEET, "$foglio!$INDICE_COLONNA_RESIDENZA$rowIndex:$rowIndex"].execute()
+            .getValues().first()
+    } catch (t: Throwable) {
+        errorHandler?.onGetAnimatoreError(t)
+        listOf()
+    }
+
+    override suspend fun refreshAnimatore(foglio: String, animatore: String) {
+        //TODO aggiungere controlli per presenza del file e dell'animatore
+        val sheet = malaFile.malaFogli[foglio]
+        val toUpdate = sheet!!.animatori[animatore]!!
+
+        Log.d(TAG, "refresh animatore $animatore in foglio $foglio")
+        if (LocalDateTime.now().minusMinutes(5).isBefore(toUpdate.dataAggiornamento)) {
+            Log.d(TAG, "dati abbastanza freschi, salto il refresh")
+            return
+        }
+        val rowIndex = INDICE_RIGA_PRIMO_ANIMATORE + toUpdate.index
+        val noteIndex = (sheet.dayNum + 4).toInt()
+
+        val line = getAnimatoreCompleto(foglio, rowIndex)
+
+        line.forEachIndexed { i, v ->
+            when (i) {
+                0 -> toUpdate.updateDomicilio(v.toString())
+                1 -> toUpdate.updateAuto(v.toString() == "1")
+                2 -> toUpdate.updateAdulti(v.toString() == "1")
+                3 -> toUpdate.updateBambini(v.toString() == "1")
+                noteIndex -> toUpdate.updateNote(v.toString())
+                else -> toUpdate.setDisponibilita(
+                    sheet.primoGiorno.plusDays(i - 4L),
+                    v.toString()
                 )
             }
         }
-        result.add(anim)
+        toUpdate.dataAggiornamento = LocalDateTime.now()
     }
-    return result
-}
-
-private suspend fun fetchFoglio(name: String, complete: Boolean = false): Foglio {
-
-    val giorniNelFoglio =
-        service.spreadsheets().values()[GOOLE_SPREADSHEET, "$name!$RIGA_GIORNI"].execute()
-    Log.d(TAG, "Numero giorni = ${(giorniNelFoglio.getValues().first().size)}")
-
-    val splitted = name.split(FILE_NAME_SEPARATOR)
-
-    val first = giorniNelFoglio.getValues().first().first().toString().split(" ")
-    val last = giorniNelFoglio.getValues().first().last().toString().split(" ")
-
-    val primoGiorno =
-        LocalDate.of(
-            BASE_YEAR + splitted[1].toInt(),
-            mapMonth[first[1].lowercase()]!!,
-            first[0].toInt()
-        )
-    val ultimoGiorno =
-        LocalDate.of(
-            BASE_YEAR + splitted[1].toInt(),
-            mapMonth[last[1].lowercase()]!!,
-            last[0].toInt()
-        )
-
-    val result = Foglio(
-        label = name,
-        primoGiorno = primoGiorno,
-        ultimoGiorno = ultimoGiorno,
-        dataAggiornamento = LocalDateTime.now()
-    )
-    if (complete) {
-        fetchAnimatoriComplete(name, result)
-    } else {
-        fetchAnimatori(name)
-    }.forEach { result.addAnimatore(it.label, it) }
-    return result
-}
-
-override suspend fun fetchAnimatoriInFoglio(
-    foglio: String,
-    complete: Boolean
-): List<Animatore> {
-    //controllo se il foglio esiste già nel malaFIle, altrimento lo scarico e lo aggiungo al file
-    val mFoglio =
-        malaFile.malaFogli[foglio] ?: fetchFoglio(
-            foglio,
-            complete
-        ).also { malaFile.addFoglio(it) }
-
-    if (complete && LocalDateTime.now().minusMinutes(30).isBefore(mFoglio.dataAggiornamento)) {
-        malaFile.updateFoglio(fetchFoglio(foglio, true))
-    }
-    return mFoglio.getAnimatoriAsList()
-
-}
-
-
-override suspend fun refreshAnimatore(foglio: String, animatore: String) {
-    //TODO aggiungere controlli per presenza del file e dell'animatore
-    val sheet = malaFile.malaFogli[foglio]
-    val toUpdate = sheet!!.animatori[animatore]!!
-
-    Log.d(TAG, "refresh animatore $animatore in foglio $foglio")
-    if (LocalDateTime.now().minusMinutes(5).isBefore(toUpdate.dataAggiornamento)) {
-        Log.d(TAG, "dati abbastanza freschi, salto il refresh")
-        return
-    }
-    val rowIndex = INDICE_RIGA_PRIMO_ANIMATORE + toUpdate.index
-    val noteIndex = (sheet.dayNum + 4).toInt()
-
-    val line = service.spreadsheets()
-        .values()[GOOLE_SPREADSHEET, "$foglio!$INDICE_COLONNA_RESIDENZA$rowIndex:$rowIndex"].execute()
-        .getValues().first()
-
-    line.forEachIndexed { i, v ->
-        when (i) {
-            0 -> toUpdate.updateDomicilio(v.toString())
-            1 -> toUpdate.updateAuto(v.toString() == "1")
-            2 -> toUpdate.updateAdulti(v.toString() == "1")
-            3 -> toUpdate.updateBambini(v.toString() == "1")
-            noteIndex -> toUpdate.updateNote(v.toString())
-            else -> toUpdate.setDisponibilita(
-                sheet.primoGiorno.plusDays(i - 4L),
-                v.toString()
-            )
-        }
-    }
-    toUpdate.dataAggiornamento = LocalDateTime.now()
-}
 
 
 //endregion
 
 //private var foglioSelezionato: Foglio? = null
 
-override fun getAnimatore(foglio: String, animatore: String): Animatore {
-    return getFoglio(foglio).animatori[animatore]!!
-}
+    override fun getAnimatore(foglio: String, animatore: String): Animatore {
+        return getFoglio(foglio).animatori[animatore]!!
+    }
 
-override fun getDomicilioAsFlow(foglio: String, animatore: String): StateFlow<String> {
-    return getAnimatore(foglio, animatore).getDomicilioAsFlow()
-}
+    override fun getDomicilioAsFlow(foglio: String, animatore: String): StateFlow<String> {
+        return getAnimatore(foglio, animatore).getDomicilioAsFlow()
+    }
 
-override fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-    return getAnimatore(foglio, animatore).getAutoAsFlow()
-}
+    override fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getAutoAsFlow()
+    }
 
-override fun getBambiniAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-    return getAnimatore(foglio, animatore).getBambiniAsFlow()
-}
+    override fun getBambiniAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getBambiniAsFlow()
+    }
 
-override fun getAdultiAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-    return getAnimatore(foglio, animatore).getAdultiAsFlow()
-}
+    override fun getAdultiAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
+        return getAnimatore(foglio, animatore).getAdultiAsFlow()
+    }
 
-override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
-    return getAnimatore(foglio, animatore).getNoteAsFlow()
-}
+    override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
+        return getAnimatore(foglio, animatore).getNoteAsFlow()
+    }
 
-private fun updateGoogleCell(foglio: String, cella: String, value: String) {
-    val x = ValueRange().setValues(listOf(listOf(value)))
-    //TODO gestione errori
-    service.spreadsheets().values().update(GOOLE_SPREADSHEET, "$foglio!$cella", x)
-        .setValueInputOption(RAW)
-        .execute()
-}
+    private fun updateGoogleCell(foglio: String, cella: String, value: String) {
+        val x = ValueRange().setValues(listOf(listOf(value)))
+        try {
+            service.spreadsheets().values().update(GOOLE_SPREADSHEET, "$foglio!$cella", x)
+                .setValueInputOption(RAW)
+                .execute()
+        } catch (t: Throwable) {
+            errorHandler?.onUpdateCellError(t)
+        }
+    }
 
+    override suspend fun updateDomicilio(foglio: String, animatore: String, value: String) {
+        val anim = getAnimatore(foglio, animatore)
+        CoroutineScope(IO).launch {
+            updateGoogleCell(
+                foglio,
+                "$INDICE_COLONNA_RESIDENZA${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
+                value
+            )
+        }
+        anim.updateDomicilio(value)
+    }
 
-override suspend fun updateDomicilio(foglio: String, animatore: String, value: String) {
-    val anim = getAnimatore(foglio, animatore)
-    CoroutineScope(IO).launch {
+    override suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) {
+        val anim = getAnimatore(foglio, animatore)
         updateGoogleCell(
             foglio,
-            "$INDICE_COLONNA_RESIDENZA${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-            value
+            "$INDICE_COLONNA_AUTO${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
+            if (value) "1" else "0"
         )
+        anim.updateAuto(value)
     }
-    anim.updateDomicilio(value)
-}
 
-override suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) {
-    val anim = getAnimatore(foglio, animatore)
-    updateGoogleCell(
-        foglio,
-        "$INDICE_COLONNA_AUTO${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-        if (value) "1" else "0"
-    )
-    anim.updateAuto(value)
-}
-
-override suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) {
-    val anim = getAnimatore(foglio, animatore)
-    updateGoogleCell(
-        foglio,
-        "$INDICE_COLONNA_BAMBINI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-        if (value) "1" else "0"
-    )
-    anim.updateBambini(value)
-}
-
-override suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
-    val anim = getAnimatore(foglio, animatore)
-    updateGoogleCell(
-        foglio,
-        "$INDICE_COLONNA_ADULTI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-        if (value) "1" else "0"
-    )
-    anim.updateAdulti(value)
-}
-
-override suspend fun updateNote(foglio: String, animatore: String, value: String) {
-    val sheet = malaFile.malaFogli[foglio]!!
-    val anim = getAnimatore(foglio, animatore)
-    CoroutineScope(IO).launch {
-        val indiceNote = INDICE_COLONNA_PRIMO_GIORNO_INT + sheet.dayNum
+    override suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) {
+        val anim = getAnimatore(foglio, animatore)
         updateGoogleCell(
             foglio,
-            "R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indiceNote",
-            value
+            "$INDICE_COLONNA_BAMBINI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
+            if (value) "1" else "0"
         )
+        anim.updateBambini(value)
     }
-    anim.updateNote(value)
-}
 
-override fun getFoglio(name: String): Foglio {
-    return malaFile.malaFogli[name] ?: error("Non è stato possibile trovare il foglio $name")
-}
-
-override fun getDisponibilitaAsFlow(
-    foglio: String,
-    animatore: String,
-    date: LocalDate
-): StateFlow<String> =
-    getAnimatore(foglio, animatore).getDisponibilitaAsFlow(date)
-
-override suspend fun updateDisponibilita(
-    foglio: String,
-    animatore: String,
-    date: LocalDate,
-    content: String
-) {
-    val sheet = malaFile.malaFogli[foglio]!!
-    val anim = getAnimatore(foglio, animatore)
-    CoroutineScope(IO).launch {
-        val indice = INDICE_COLONNA_PRIMO_GIORNO_INT +
-                ChronoUnit.DAYS.between(sheet.primoGiorno, date)
+    override suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
+        val anim = getAnimatore(foglio, animatore)
         updateGoogleCell(
             foglio,
-            //"R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice",
-            "R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice!R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice",
-            content
+            "$INDICE_COLONNA_ADULTI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
+            if (value) "1" else "0"
         )
+        anim.updateAdulti(value)
     }
-    anim.updateDisponibilita(date, content)
-}
+
+    override suspend fun updateNote(foglio: String, animatore: String, value: String) {
+        val sheet = malaFile.malaFogli[foglio]!!
+        val anim = getAnimatore(foglio, animatore)
+        CoroutineScope(IO).launch {
+            val indiceNote = INDICE_COLONNA_PRIMO_GIORNO_INT + sheet.dayNum
+            updateGoogleCell(
+                foglio,
+                "R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indiceNote",
+                value
+            )
+        }
+        anim.updateNote(value)
+    }
+
+    override fun getFoglio(name: String): Foglio {
+        return malaFile.malaFogli[name] ?: error("Non è stato possibile trovare il foglio $name")
+    }
+
+    override fun getDisponibilitaAsFlow(
+        foglio: String,
+        animatore: String,
+        date: LocalDate
+    ): StateFlow<String> =
+        getAnimatore(foglio, animatore).getDisponibilitaAsFlow(date)
+
+    override suspend fun updateDisponibilita(
+        foglio: String,
+        animatore: String,
+        date: LocalDate,
+        content: String
+    ) {
+        val sheet = malaFile.malaFogli[foglio]!!
+        val anim = getAnimatore(foglio, animatore)
+        CoroutineScope(IO).launch {
+            val indice = INDICE_COLONNA_PRIMO_GIORNO_INT +
+                    ChronoUnit.DAYS.between(sheet.primoGiorno, date)
+            updateGoogleCell(
+                foglio,
+                //"R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice",
+                "R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice:R${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}C$indice",
+                content
+            )
+        }
+        anim.updateDisponibilita(date, content)
+    }
 }

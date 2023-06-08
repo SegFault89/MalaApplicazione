@@ -1,10 +1,10 @@
-package it.dario.malaapplicazione.presentation.inserisciDisponibilita
+package it.dario.malaapplicazione.presentation.inseriscidisponibilita
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.*

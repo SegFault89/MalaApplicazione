@@ -1,11 +1,9 @@
-package it.dario.malaapplicazione.presentation.visualizzaDisponibilita
+package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.*
@@ -26,12 +24,19 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
 
     val mesi = repository.getFogli()
 
-
     fun updateFoglioSelezionato(newValue: String) {
+        _giornoSelezionato.value = null
         _loadingFoglio.value = true
         fetchFoglio(newValue)
         _foglioSelezionato.value = newValue
     }
+
+    fun updateSelectedDay(day: LocalDate) {
+        _giornoSelezionato.value = day
+    }
+
+    fun getAnimatoriDisponibili(foglio: String, giorno: LocalDate) =
+        repository.getAnimatoriDisponibili(foglio, giorno)
 
 
     private fun fetchFoglio(foglio: String) = CoroutineScope(IO).launch {

@@ -1,4 +1,4 @@
-package it.dario.malaapplicazione.presentation.sharedComposable
+package it.dario.malaapplicazione.presentation.sharedcomposable
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack

@@ -21,6 +21,7 @@ class MockDataSource : IDisponibilitaDataSource {
     private val _isReady = MutableStateFlow(false)
     override val isReady: StateFlow<Boolean>
         get() = _isReady
+    override var errorHandler: IDatasourceErrorHandler? = null
 
 
     //region dati fittizi

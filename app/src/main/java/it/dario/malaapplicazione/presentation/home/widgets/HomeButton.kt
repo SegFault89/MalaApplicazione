@@ -16,6 +16,13 @@ import it.dario.malaapplicazione.presentation.theme.Typography
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * tasti che vengono visualizzati nella homePage
+ * @param modifier modifier
+ * @param label testo sul tasto
+ * @param onclick funzione chiamata al click
+ * @param enabled StateFlow che controlla l'abilitazione del tasto
+ */
 @Composable
 fun HomeButton(
     modifier: Modifier,
@@ -24,12 +31,12 @@ fun HomeButton(
     enabled: StateFlow<Boolean> = MutableStateFlow(true)
 ) {
 
-    val _state by enabled.collectAsState()
+    val state by enabled.collectAsState()
 
     Button(
         modifier = modifier.height(HomeButtonHeight),
         onClick = onclick,
-        enabled = _state
+        enabled = state
     ) {
         Text(text = label, style = Typography.titleLarge)
     }
