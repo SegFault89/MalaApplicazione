@@ -1,4 +1,4 @@
-package it.dario.malaapplicazione.presentation.sharedComposable
+package it.dario.malaapplicazione.presentation.sharedcomposable
 
 import android.util.Log
 import androidx.compose.material3.OutlinedTextField

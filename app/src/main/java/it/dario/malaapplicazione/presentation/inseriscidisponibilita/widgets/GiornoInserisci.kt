@@ -1,4 +1,4 @@
-package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
+package it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -42,16 +42,23 @@ import it.dario.malaapplicazione.data.Constants.DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
-import it.dario.malaapplicazione.presentation.theme.DisponibileOrange
-import it.dario.malaapplicazione.presentation.visualizzaDisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-
+/**
+ * Cella del giorno per il calendario nella schermata "InserisciDisponibilita"
+ *
+ * @param viewModel viewmodel di riferimento con i dati
+ * @param day giorno di riferimento per la cella
+ * @param foglio nome del foglio di riferimento per il recupero dati
+ * @param animatore animatore di riferimento per il recupero dei dati
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GiornoInserisci(
@@ -65,9 +72,6 @@ fun GiornoInserisci(
     val currentValue by viewModel.getDisponibilitaAsFlow(foglio, animatore, day).collectAsState()
 
     var openDialog by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
 
     Box(
         modifier = Modifier
@@ -99,8 +103,8 @@ fun GiornoInserisci(
                 containerColor = when (currentValue) {
                     NON_DISPONIBILE -> DisponibileRed
                     DISPONIBILE -> DisponibileGreen
-                    NO_DISPONIBILITA -> DisponibileOrange
-                    else -> DisponibileOrange
+                    NO_DISPONIBILITA -> DisponibileYellow
+                    else -> DisponibileYellow
                 },
             ),
         ) {
@@ -114,8 +118,6 @@ fun GiornoInserisci(
 
     // Sheet content
     if (openDialog) {
-        var newDisponibilita = currentValue
-
         CustomAlertDialog(
             day = day,
             disponibilita = currentValue,
@@ -129,62 +131,4 @@ fun GiornoInserisci(
             dismiss = { openDialog = false }
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomAlertDialog(
-    day: LocalDate,
-    disponibilita: String,
-    saveValue: (String) -> Unit,
-    dismiss: () -> Unit
-) {
-    AlertDialog(onDismissRequest = dismiss) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = MaterialTheme.shapes.large,
-            tonalElevation = AlertDialogDefaults.TonalElevation
-        ) {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.Center) {
-                Text(
-                    day.format(
-                        DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
-                            .withLocale(Locale.getDefault())
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                var value by remember { mutableStateOf(disponibilita) }
-
-                OutlinedTextField(
-                    value = value,
-                    onValueChange = { value = it },
-                    label = { Text(stringResource(id = R.string.inserisci_disponibilita_dialog)) },
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-                TextButton(
-                    onClick = {saveValue(value); dismiss() },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(stringResource(id = R.string.confirm))
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun DialogPreview() {
-    val mock = MockDataSource()
-    CustomAlertDialog(
-        day = mock.foglioNovembre.ultimoGiorno,
-        disponibilita = "dalle 18:00",
-        saveValue = {},
-        dismiss = {}
-    )
 }

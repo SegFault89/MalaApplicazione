@@ -14,4 +14,19 @@
     <string name="adulti">Note</string>
     <string name="inserisci_disponibilita_dialog">Inserisci disponibilità</string>
     <string name="confirm">Conferma</string>
+    <string name="si">Si</string>
+    <string name="no">No</string>
+    <string name="qr_content_descriptor">quack code fattura</string>
+    <string name="naziionalita">Nazionalità</string>
+    <string name="naziionalita_value">IT</string>
+    <string name="codice_fiscale">Codice Fiscale</string>
+    <string name="codice_fiscale_value">03527290120</string>
+    <string name="partita_iva">Partita Iva</string>
+    <string name="partita_iva_value">03527290120</string>
+    <string name="denominazione">Denominazione</string>
+    <string name="denominazione_value">MALASTRANA.SRL</string>
+    <string name="indirizzo">Indirizzo</string>
+    <string name="indirizzo_value">Via Agnelli 19, 21013 Gallarate VA IT</string>
+    <string name="codiceDestinatario">Codice Destinatario</string>
+    <string name="codiceDestinatario_value">KRRH6B9</string>
 </resources>

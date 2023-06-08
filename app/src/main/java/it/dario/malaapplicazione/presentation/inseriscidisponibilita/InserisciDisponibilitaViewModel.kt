@@ -1,14 +1,25 @@
-package it.dario.malaapplicazione.presentation.visualizzaDisponibilita
+package it.dario.malaapplicazione.presentation.inseriscidisponibilita
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.repositories.DisponibilitaRepository
-import it.dario.malaapplicazione.presentation.inserisciDisponibilita.InserisciUiState
+import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
+
+
+    private val _loadingFoglio: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var loadingFoglio: StateFlow<Boolean> = _loadingFoglio.asStateFlow()
+
+
+    private val _loadingAnimatore: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var loadingAnimatore: StateFlow<Boolean> = _loadingAnimatore.asStateFlow()
 
 
     private val _foglioSelezionato: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -18,21 +29,29 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     var animatoreSelezionato: StateFlow<String?> = _animatoreSelezionato.asStateFlow()
 
     val mesi = repository.getFogli()
+    var listAnimatori = listOf<Animatore>()
+
 
     fun updateFoglioSelezionato(newValue: String) {
-            _foglioSelezionato.value = newValue
-            //TODO controllare se il nuovo foglio contiene l'animatore e nel caso mantenerlo selezionato?
-            // mi sembrerebbe un po' confusionario, risparmiando poi solo una selezione
-            _animatoreSelezionato.value = null
+        fetchAnimatoriInFoglio(newValue)
+        _foglioSelezionato.value = newValue
+        _animatoreSelezionato.value = null
     }
 
     fun updateAnimatoreSelezionato(newValue: String) {
+        _loadingAnimatore.value = true
+        viewModelScope.launch(IO) {
+            repository.refreshAnimatore(foglioSelezionato.value!!, newValue)
+            _loadingAnimatore.value = false
+        }
         _animatoreSelezionato.value = newValue
     }
 
 
-    fun getAnimatoriInFoglio(foglio: String): List<Animatore> {
-        return repository.getAnimatori(foglio)
+    private fun fetchAnimatoriInFoglio(foglio: String) = CoroutineScope(IO).launch {
+        _loadingFoglio.value = true
+        listAnimatori = repository.fetchAnimatori(foglio)
+        _loadingFoglio.value = false
     }
 
     fun getPrimoGiorno(foglio: String): LocalDate {
@@ -51,34 +70,37 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
         animatore: String,
         day: LocalDate,
         newValue: String
-    ) {
-        repository.setDisponibilita(foglio, animatore, day, newValue)
-    }
+    ) = CoroutineScope(IO).launch { repository.setDisponibilita(foglio, animatore, day, newValue) }
 
     fun getDomicilioAsFlow(foglio: String, animatore: String) =
         repository.getDomicilioAsFlow(foglio, animatore)
 
-    fun updateDomicilio(foglio: String, animatore: String, value: String) = repository.updateDomicilio(foglio, animatore, value)
+    fun updateDomicilio(foglio: String, animatore: String, value: String) =
+        CoroutineScope(IO).launch { repository.updateDomicilio(foglio, animatore, value) }
 
     fun getNoteAsFlow(foglio: String, animatore: String) =
         repository.getNoteAsFlow(foglio, animatore)
 
-    fun updateNote(foglio: String, animatore: String, value: String) = repository.updateNote(foglio, animatore, value)
+    fun updateNote(foglio: String, animatore: String, value: String) =
+        CoroutineScope(IO).launch { repository.updateNote(foglio, animatore, value) }
 
     fun getAutoAsFlow(foglio: String, animatore: String) =
         repository.getAutoAsFlow(foglio, animatore)
 
-    fun updateAuto(foglio: String, animatore: String, value: Boolean) = repository.updateAuto(foglio, animatore, value)
+    fun updateAuto(foglio: String, animatore: String, value: Boolean) =
+        CoroutineScope(IO).launch { repository.updateAuto(foglio, animatore, value) }
 
     fun getBambiniAsFlow(foglio: String, animatore: String) =
         repository.getBambiniAsFlow(foglio, animatore)
 
-    fun updateBambini(foglio: String, animatore: String, value: Boolean) = repository.updateBambini(foglio, animatore, value)
+    fun updateBambini(foglio: String, animatore: String, value: Boolean) =
+        CoroutineScope(IO).launch { repository.updateBambini(foglio, animatore, value) }
 
     fun getAdultiAsFlow(foglio: String, animatore: String) =
         repository.getAdultiAsFlow(foglio, animatore)
 
-    fun updateAdulti(foglio: String, animatore: String, value: Boolean) = repository.updateAdulti(foglio, animatore, value)
+    fun updateAdulti(foglio: String, animatore: String, value: Boolean) =
+        CoroutineScope(IO).launch { repository.updateAdulti(foglio, animatore, value) }
 }
 
 @Suppress("UNCHECKED_CAST")

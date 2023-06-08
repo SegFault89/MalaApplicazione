@@ -1,10 +1,15 @@
 package it.dario.malaapplicazione.data.model
 
+import it.dario.malaapplicazione.data.Constants.DISPONIBILE
+import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
+import it.dario.malaapplicazione.data.IdGenerator
+import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 /**
  * rappresenta un animatore e le sue disponibilità date
@@ -18,13 +23,16 @@ import java.time.LocalDate
  * @param _note note
  */
 data class Animatore(
+    val index: Int,
     val nome: String,
     val cognome: String,
-    private var _domicilio: String,
-    private var _auto: Boolean,
-    private var _bambini: Boolean,
-    private var _adulti: Boolean,
-    private var _note: String,
+    private var _domicilio: String = "",
+    private var _auto: Boolean = false,
+    private var _bambini: Boolean = false,
+    private var _adulti: Boolean = false,
+    private var _note: String = "",
+    var dataAggiornamento: LocalDateTime = LocalDateTime.now().minusDays(1), //appena un animatore viene creato, lo considero "vecchio" in modo da aggiornalo quando serve
+    val id: Int = IdGenerator.getNext
 ) {
 
     //duplicate per mantenere il set priivato
@@ -50,7 +58,12 @@ data class Animatore(
     private val disponibilita: MutableMap<LocalDate, MutableStateFlow<String>> = mutableMapOf()
 
     fun setDisponibilita(date: LocalDate, content: String) {
-        disponibilita[date] = MutableStateFlow(content)
+        //disponibilita[date] = MutableStateFlow(content)
+        if (disponibilita[date] == null) {
+            disponibilita[date] = MutableStateFlow(content)
+        } else {
+            updateDisponibilita(date, content)
+        }
     }
 
     fun updateDisponibilita(date: LocalDate, content: String) {
@@ -116,6 +129,15 @@ data class Animatore(
     fun updateNote (value: String) {
         _note = value
         noteFlow.value = value
+    }
+
+    fun getTipoDisponibilita(date: LocalDate) : DisponibilitaEnum {
+        return when (getDisponibilita(date)) {
+            DISPONIBILE -> DisponibilitaEnum.DISPONIBILE
+            NO_DISPONIBILITA,
+            NON_DISPONIBILE -> DisponibilitaEnum.NON_DISPONIBILE
+            else -> DisponibilitaEnum.ALTRO
+        }
     }
 
 }

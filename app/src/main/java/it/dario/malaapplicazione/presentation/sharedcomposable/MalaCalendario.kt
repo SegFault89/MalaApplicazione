@@ -1,4 +1,4 @@
-package it.dario.malaapplicazione.presentation.inserisciDisponibilita.widgets
+package it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
