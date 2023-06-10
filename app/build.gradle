@@ -21,6 +21,14 @@ android {
             useSupportLibrary true
         }
     }
+    signingConfigs {
+        release {
+            storeFile rootProject.file('keystore.jks')
+            keyAlias 'MalaApplicazione'
+            storePassword 'IlVeroMerlino!'
+            keyPassword 'IlVeroMerlino'
+        }
+    }
 
     buildTypes {
         release {
@@ -28,6 +36,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "Boolean", "MOCK_DATA", "false"
             buildConfigField "String", "RETROFIT_LOG_LEVEL", "\"BASIC\""
+            signingConfig signingConfigs.release
         }
 
         debugMock {
