@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
+import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
 import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
+import it.dario.malaapplicazione.presentation.theme.TextOverColor
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModel
 import java.time.LocalDate
 
@@ -52,14 +54,14 @@ fun GiornoVisualizza(
         contentAlignment = Alignment.Center
     ) {
         Card(
-            onClick = {viewModel.updateSelectedDay(day)},
+            onClick = { viewModel.updateSelectedDay(day) },
             modifier = Modifier
                 .padding(2.dp)
                 .fillMaxSize(),
             colors = CardDefaults.cardColors(
                 containerColor = if (daySelected == day) {
-                    MaterialTheme.colorScheme.primaryContainer }
-                else {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 },
             )
@@ -80,39 +82,48 @@ fun GiornoVisualizza(
                         .align(Alignment.BottomCenter),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    if (disponibilitaGiornaliere.disponibili > 0) {
-                        Text(
-                            text = disponibilitaGiornaliere.disponibili.toString(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 10.sp,
-                            modifier = Modifier
-                                .background(DisponibileGreen, shape = CircleShape)
-                                .padding(1.dp),
-                        )
-                    }
-                    if (disponibilitaGiornaliere.altro > 0) {
-                        Text(
-                            text = disponibilitaGiornaliere.altro.toString(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 10.sp,
-                            modifier = Modifier
-                                .background(DisponibileYellow, shape = CircleShape)
-                                .padding(1.dp),
-                        )
-                    }
-                    if (disponibilitaGiornaliere.nonDisponibili > 0) {
-                        Text(
-                            text = disponibilitaGiornaliere.nonDisponibili.toString(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 10.sp,
-                            modifier = Modifier
-                                .background(DisponibileRed, shape = CircleShape)
-                                .padding(1.dp),
-                        )
-                    }
+                    NumeriDisponibilita(disponibilitaGiornaliere)
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun NumeriDisponibilita(disponibilitaGiornaliere: DisponibilitaGiornaliere) {
+    if (disponibilitaGiornaliere.disponibili > 0) {
+        Text(
+            text = disponibilitaGiornaliere.disponibili.toString(),
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp,
+            color = TextOverColor,
+            modifier = Modifier
+                .background(DisponibileGreen, shape = CircleShape)
+                .padding(1.dp),
+        )
+    }
+    if (disponibilitaGiornaliere.altro > 0) {
+        Text(
+            text = disponibilitaGiornaliere.altro.toString(),
+            textAlign = TextAlign.Center,
+            fontSize = 10.sp,
+            color = TextOverColor,
+            modifier = Modifier
+                .background(DisponibileYellow, shape = CircleShape)
+                .padding(1.dp),
+        )
+    }
+    if (disponibilitaGiornaliere.nonDisponibili > 0) {
+        Text(
+            text = disponibilitaGiornaliere.nonDisponibili.toString(),
+            textAlign = TextAlign.Center,
+            color = TextOverColor,
+            fontSize = 10.sp,
+            modifier = Modifier
+                .background(DisponibileRed, shape = CircleShape)
+                .padding(1.dp),
+        )
     }
 }
 

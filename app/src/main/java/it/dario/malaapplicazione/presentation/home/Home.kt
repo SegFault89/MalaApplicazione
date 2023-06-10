@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.datasources.MockDataSource
@@ -27,6 +27,8 @@ import it.dario.malaapplicazione.presentation.MalaViewModel
 import it.dario.malaapplicazione.presentation.home.widgets.HomeButton
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaProgressIndicator
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
+import it.dario.malaapplicazione.presentation.theme.MarginBig
+import it.dario.malaapplicazione.presentation.theme.MarginNormal
 
 /**
  * Pagina iniziale dell'app
@@ -63,10 +65,15 @@ fun Home(
 
             Box {
                 MalaProgressIndicator(Modifier.align(Alignment.TopEnd), viewModel.isReady)
+                Text(text = stringResource(id = R.string.test_file),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(
+                    MarginNormal))
                 Column(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(IntrinsicSize.Max),
+                        .fillMaxSize()
+                        .width(IntrinsicSize.Max)
+                        .padding(MarginBig),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly,
                 ) {
