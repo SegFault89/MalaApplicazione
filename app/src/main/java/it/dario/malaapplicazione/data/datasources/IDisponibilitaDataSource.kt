@@ -2,7 +2,6 @@ package it.dario.malaapplicazione.data.datasources
 
 import android.content.Context
 import it.dario.malaapplicazione.data.model.Animatore
-import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.data.model.Foglio
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
@@ -26,9 +25,6 @@ sealed interface IDisponibilitaDataSource {
      */
     fun getFogli() : List<String>
 
-    /**
-     * restituisce una lista degli animatori presenti nel foglio indicato
-     */
     fun getFoglio(name: String): Foglio
     fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate): StateFlow<String>
     fun getAnimatore(foglio: String, animatore: String): Animatore

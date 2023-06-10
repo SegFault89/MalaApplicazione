@@ -16,6 +16,8 @@ android {
         versionCode 1
         versionName "0.0.1"
 
+        setProperty("archivesBaseName", "MalaApplicazione" + "-v" + versionCode + "(" + versionName + ")")
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
@@ -26,7 +28,7 @@ android {
             storeFile rootProject.file('keystore.jks')
             keyAlias 'MalaApplicazione'
             storePassword 'IlVeroMerlino!'
-            keyPassword 'IlVeroMerlino'
+            keyPassword 'IlVeroMerlino!'
         }
     }
 
