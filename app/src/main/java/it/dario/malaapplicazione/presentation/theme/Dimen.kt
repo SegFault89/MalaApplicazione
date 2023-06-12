@@ -6,6 +6,8 @@ val HomeButtonHeight = 64.dp
 
 val MarginBig = 32.dp
 val MarginNormal = 12.dp
+val MarginSmall = 6.dp
+
 val BigSpacer = 24.dp
 
 val VerticalSpacingNormal = 8.dp
