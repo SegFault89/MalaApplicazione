@@ -30,11 +30,13 @@ import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
 @Composable
 fun InserisciDisponibilita(
     viewModel: InserisciDisponibilitaViewModel,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    openBug: () -> Unit = {}
 ) {
     MalaScaffold(
         label = stringResource(id = R.string.inserisci_disponibilita),
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
+        openBug = openBug
     )
     { contentPadding ->
         Content(Modifier.padding(contentPadding), viewModel)
