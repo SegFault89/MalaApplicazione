@@ -31,7 +31,8 @@ import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModelFactory
-import it.dario.malaapplicazione.presentation.sharedcomposable.BugReportDialog
+import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportDialog
+import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportViewModel
 import it.dario.malaapplicazione.presentation.sharedcomposable.ErrorDialog
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilita
@@ -141,18 +142,22 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             ErrorDialog(
-                                messageId = it.arguments?.getString(ERROR_MESSAGE_ID)?.toIntOrNull() ?: R.string.generic_error
+                                messageId = it.arguments?.getString(ERROR_MESSAGE_ID)?.toIntOrNull()
+                                    ?: R.string.generic_error
                             )
                         }
                         dialog(
                             BUG_REPORT,
                             dialogProperties = DialogProperties(
-                                usePlatformDefaultWidth = false,
+                                usePlatformDefaultWidth = true,
                                 dismissOnBackPress = true,
                                 dismissOnClickOutside = false
                             )
                         ) {
-                            BugReportDialog()
+                            BugReportDialog(
+                                viewModel = BugReportViewModel(),
+                                dismiss = navController::navigateUp
+                            )
                         }
                     }
                 }

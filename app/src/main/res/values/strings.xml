@@ -40,4 +40,15 @@
     <string name="test_file">Attenzione, versione di prova:\nil file disponibilità utilizzato non è quello vero</string>
     <string name="version">"versione %s"</string>
     <string name="bugreport">Segnala bug</string>
+    <string name="feature">Feature</string>
+    <string name="bug">Bug</string>
+    <string name="titolo">Titolo</string>
+    <string name="descrizione">Descrizione</string>
+    <string name="send">Invia</string>
+    <string name="title_dialog_feature">Suggerisci una nuova funzionalità</string>
+    <string name="title_dialog_bug">Segnala un bug</string>
+    <string name="bug_report_fill_data">Compilare titolo e descrizione</string>
+    <string name="bug_report_error">Non è stato possibile creare il task</string>
+    <string name="bug_report_success">Task creato con successo</string>
+    <string name="name_optional">Nome (opzionale)</string>
 </resources>
