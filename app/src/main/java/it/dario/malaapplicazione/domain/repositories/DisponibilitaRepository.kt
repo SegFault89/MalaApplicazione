@@ -1,10 +1,7 @@
 package it.dario.malaapplicazione.domain.repositories
 
 import android.util.Log
-import it.dario.malaapplicazione.data.Constants
-import it.dario.malaapplicazione.data.Constants.NON_DISPONIBILE
 import it.dario.malaapplicazione.data.Constants.TAG
-import it.dario.malaapplicazione.data.datasources.GoogleSheetDataSource
 import it.dario.malaapplicazione.data.datasources.IDisponibilitaDataSource
 import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
 import it.dario.malaapplicazione.data.model.Animatore
@@ -24,16 +21,12 @@ class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
         return datasource.getFoglio(nome)
     }
 
-    suspend fun fetchAnimatori(foglio: String, complete: Boolean = false): List<Animatore> {
-        return datasource.fetchAnimatoriInFoglio(foglio, complete)
+    suspend fun fetchAnimatori(foglio: String, complete: Boolean = false, force: Boolean = false): List<Animatore> {
+        return datasource.fetchAnimatoriInFoglio(foglio, complete, force)
     }
 
     fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate) =
         datasource.getDisponibilitaAsFlow(foglio = foglio, animatore = animatore, date = date)
-
-    fun getAnimatore(foglio: String, animatore: String): Animatore =
-        datasource.getAnimatore(foglio, animatore)
-
 
     suspend fun setDisponibilita(
         foglio: String,

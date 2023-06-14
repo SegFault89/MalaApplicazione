@@ -13,6 +13,7 @@ fun MalaScaffold(
     label: String,
     navigateUp: () -> Unit,
     openBug: () -> Unit,
+    additionalAction: List<@Composable () -> Unit> = listOf(),
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -24,6 +25,7 @@ fun MalaScaffold(
                 navigationIcon = { GoBack(navigateUp = navigateUp) },
                 actions = {
                     BugReportIcon(openBug)
+                    additionalAction.forEach {it()}
                 }
             )
         }) { contentPadding ->

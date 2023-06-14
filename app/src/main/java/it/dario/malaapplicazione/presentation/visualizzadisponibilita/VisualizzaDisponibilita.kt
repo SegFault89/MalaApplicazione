@@ -1,6 +1,7 @@
 package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +11,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AndroidUiDispatcher.Companion.Main
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
@@ -29,6 +36,8 @@ import it.dario.malaapplicazione.presentation.theme.Others.spinnerModifier
 import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.AnimatoreListItem
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.GiornoVisualizza
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun VisualizzaDisponibilita(
@@ -37,10 +46,21 @@ fun VisualizzaDisponibilita(
     openBug: () -> Unit
 
 ) {
+
+    val context = LocalContext.current
+
     MalaScaffold(
-        label = stringResource(id = R.string.inserisci_disponibilita),
+        label = stringResource(id = R.string.visualizza_disponibilita),
         navigateUp = navigateUp,
-        openBug
+        additionalAction = listOf {
+            RefreshButton {
+                viewModel.refreshSheet(
+                    onComplete = { CoroutineScope(Main).launch { Toast.makeText(context, R.string.foglio_aggiornato, Toast.LENGTH_LONG).show()} },
+                    onError =  { CoroutineScope(Main).launch { Toast.makeText(context, R.string.error_aggiorna_foglio, Toast.LENGTH_LONG).show()} }
+                )
+            }
+        },
+        openBug = openBug
     )
     { contentPadding ->
         Content(Modifier.padding(contentPadding), viewModel)
@@ -137,10 +157,12 @@ fun AnimatoriList(
     giornoSelezionato?.let { giorno ->
         val lst = viewModel.getAnimatoriDisponibili(foglioSelezionato, giorno).toList()
 
-        LazyColumn(modifier = Modifier.padding(MarginNormal),
+        LazyColumn(
+            modifier = Modifier.padding(MarginNormal),
             verticalArrangement = Arrangement.spacedBy(VerticalSpacingNormal),
-            state = LazyListState(0)) {
-            items(lst, key = {(it.id*100)+giorno.dayOfMonth}) {
+            state = LazyListState(0)
+        ) {
+            items(lst, key = { (it.id * 100) + giorno.dayOfMonth }) {
                 AnimatoreListItem(
                     animatore = it,
                     giornoSelezionato = giorno
@@ -166,5 +188,17 @@ fun PreviewContent() {
     )
 }
 
+@Composable
+fun RefreshButton(
+    onClick: () -> Unit,
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(id = R.drawable.baseline_refresh_24),
+            tint = MaterialTheme.colorScheme.onBackground,
+            contentDescription = stringResource(id = R.string.bugreport)
+        )
+    }
+}
 
 

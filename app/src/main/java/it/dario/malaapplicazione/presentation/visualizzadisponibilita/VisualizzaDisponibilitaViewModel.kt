@@ -12,7 +12,6 @@ import java.time.LocalDate
 
 class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
 
-
     private val _loadingFoglio: MutableStateFlow<Boolean> = MutableStateFlow(false)
     var loadingFoglio: StateFlow<Boolean> = _loadingFoglio.asStateFlow()
 
@@ -38,6 +37,14 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
     fun getAnimatoriDisponibili(foglio: String, giorno: LocalDate) =
         repository.getAnimatoriDisponibili(foglio, giorno)
 
+    fun refreshSheet(onComplete: () -> Unit, onError: () -> Unit) = CoroutineScope(IO).launch {
+        foglioSelezionato.value?.let {
+            _loadingFoglio.value = true
+            repository.fetchAnimatori(it, true, true)
+            _loadingFoglio.value = false
+            onComplete()
+        } ?: onError()
+    }
 
     private fun fetchFoglio(foglio: String) = CoroutineScope(IO).launch {
         repository.fetchAnimatori(foglio, true)
