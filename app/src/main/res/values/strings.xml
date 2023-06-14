@@ -51,4 +51,7 @@
     <string name="bug_report_error">Non è stato possibile creare il task</string>
     <string name="bug_report_success">Task creato con successo</string>
     <string name="name_optional">Nome (opzionale)</string>
+    <string name="inserisci_disponibilita_description">Modifica la tua disponibilità</string>
+    <string name="visualizza_disponibilita_description">Vedi quali sono le disponibilità date per uno o più giorni</string>
+    <string name="dati_fattura_description">Sempre fare fattura</string>
 </resources>
