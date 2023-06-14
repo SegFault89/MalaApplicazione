@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import it.dario.malaapplicazione.presentation.theme.HomeButtonHeight
 import it.dario.malaapplicazione.presentation.theme.Typography
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,7 @@ fun HomeButton(
         onClick = onclick,
         enabled = state
     ) {
-        Text(text = label, style = Typography.titleLarge)
+        Text(text = label, style = Typography.titleLarge.copy(fontSize = 20.sp ))
     }
 }
 
