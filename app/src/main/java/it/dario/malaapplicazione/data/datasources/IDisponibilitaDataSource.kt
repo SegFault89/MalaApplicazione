@@ -45,5 +45,5 @@ sealed interface IDisponibilitaDataSource {
     suspend fun refreshAnimatore(foglio: String, animatore: String)
 
     suspend fun setup(context: Context)
-    suspend fun fetchAnimatoriInFoglio(foglio: String, complete: Boolean = false): List<Animatore>
+    suspend fun fetchAnimatoriInFoglio(foglio: String, complete: Boolean = false, force: Boolean = false): List<Animatore>
 }

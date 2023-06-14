@@ -122,7 +122,7 @@ class MockDataSource : IDisponibilitaDataSource {
     //private var foglioSelezionato: Foglio? = null
     override fun getFogli(): List<String> = malaFile.fogli
 
-    override suspend fun fetchAnimatoriInFoglio(foglio: String, complete: Boolean): List<Animatore> =
+    override suspend fun fetchAnimatoriInFoglio(foglio: String, complete: Boolean, force: Boolean): List<Animatore> =
         getFoglio(foglio).animatori.map { it.value }.toList()
 
 
@@ -183,7 +183,7 @@ class MockDataSource : IDisponibilitaDataSource {
     }
 
     override fun getDisponibilitaAsFlow(foglio: String, animatore: String, date: LocalDate): StateFlow<String> =
-        getAnimatore(foglio, animatore)!!.getDisponibilitaAsFlow(date)
+        getAnimatore(foglio, animatore).getDisponibilitaAsFlow(date)
 
     override suspend fun updateDisponibilita(
         foglio: String,

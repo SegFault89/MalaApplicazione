@@ -54,4 +54,6 @@
     <string name="inserisci_disponibilita_description">Modifica la tua disponibilità</string>
     <string name="visualizza_disponibilita_description">Vedi quali sono le disponibilità date per uno o più giorni</string>
     <string name="dati_fattura_description">Sempre fare fattura</string>
+    <string name="foglio_aggiornato">Foglio Aggiornato</string>
+    <string name="error_aggiorna_foglio">Scegli prima un foglio</string>
 </resources>
