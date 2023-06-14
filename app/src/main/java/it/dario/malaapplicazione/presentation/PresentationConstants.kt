@@ -8,6 +8,7 @@ object PresentationConstants {
     const val VISUALIZZA_DISPONIBILITA = "visualizza_disponibilita"
     const val DATI_FATTURA = "dati_fattura"
     const val ERROR_DIALOG= "error_dialog"
+    const val BUG_REPORT= "bug_report"
     //endregion
 
 

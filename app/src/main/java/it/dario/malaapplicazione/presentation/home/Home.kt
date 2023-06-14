@@ -22,6 +22,7 @@ import it.dario.malaapplicazione.BuildConfig
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.presentation.MalaViewModel
 import it.dario.malaapplicazione.presentation.home.widgets.HomeButton
+import it.dario.malaapplicazione.presentation.sharedcomposable.BugReportIcon
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaProgressIndicator
 import it.dario.malaapplicazione.presentation.theme.MarginBig
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
@@ -42,13 +43,17 @@ fun Home(
     viewModel: MalaViewModel,
     onNavigateToInserisci: () -> Unit = {},
     onNavigateToVisualizza: () -> Unit = {},
-    onNavigateToDatiFattura: () -> Unit = {}
+    onNavigateToDatiFattura: () -> Unit = {},
+    openBug: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = stringResource(id = R.string.app_name))
+                },
+                actions = {
+                    BugReportIcon(openBug)
                 }
             )
         }) { contentPadding ->

@@ -3,7 +3,6 @@ package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,11 +33,14 @@ import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.Gi
 @Composable
 fun VisualizzaDisponibilita(
     viewModel: VisualizzaDisponibilitaViewModel,
-    navigateUp: () -> Unit
+    navigateUp: () -> Unit,
+    openBug: () -> Unit
+
 ) {
     MalaScaffold(
         label = stringResource(id = R.string.inserisci_disponibilita),
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
+        openBug
     )
     { contentPadding ->
         Content(Modifier.padding(contentPadding), viewModel)
