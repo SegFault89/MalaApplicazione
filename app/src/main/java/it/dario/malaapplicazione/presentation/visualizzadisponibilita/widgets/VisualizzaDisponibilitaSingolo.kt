@@ -25,7 +25,6 @@ fun VisualizzaDisponibilitaSingolo(
 
     Log.d(Constants.TAG, "composing VisualizzaDisponibilitaSingolo")
 
-    //Se ho caricato
     MalaCalendario(
         modifier = Modifier
             .fillMaxWidth()

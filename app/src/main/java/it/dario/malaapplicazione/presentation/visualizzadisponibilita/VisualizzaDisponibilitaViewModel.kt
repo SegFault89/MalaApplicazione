@@ -39,6 +39,10 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
     fun getAnimatoriDisponibili(foglio: String, giorno: LocalDate) =
         repository.getAnimatoriDisponibili(foglio, giorno)
 
+    fun getAnimatoriDisponibiliRange(foglio: String, giorni: List<LocalDate>) =
+        repository.getAnimatoriDisponibiliRange(foglio, giorni)
+
+
     fun refreshSheet(onComplete: () -> Unit, onError: () -> Unit) = CoroutineScope(IO).launch {
         foglioSelezionato.value?.let {
             _loadingFoglio.value = true
@@ -72,48 +76,27 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
     private val _ultimoGiornoSelezionato: MutableStateFlow<LocalDate?> = MutableStateFlow(null)
     var ultimoGiornoSelezionato: StateFlow<LocalDate?> = _ultimoGiornoSelezionato.asStateFlow()
 
-    private var isLastLastSelected = false
-
     fun selectGiornoForRange(day: LocalDate) {
         //Se non ho selezionato nessun giorno, setto il primo giorno
         if (primoGiornoSelezionato.value == null && ultimoGiornoSelezionato.value == null) {
             _primoGiornoSelezionato.value = day
-            isLastLastSelected = false
         } else if (primoGiornoSelezionato.value != null && ultimoGiornoSelezionato.value == null) {
             //se ho già selezionato il primo giorno
             //se è uguale, faccio niente
-            if (day.equals(primoGiornoSelezionato.value)) {
+            if (day == primoGiornoSelezionato.value) {
                 /* nothing */
             } else if (day.isAfter(primoGiornoSelezionato.value)) {
                 //se è prima, setto il dopo
                 _ultimoGiornoSelezionato.value = day
-                isLastLastSelected = true
             } else {
                 //se è il dopo, switcho
                 _ultimoGiornoSelezionato.value = primoGiornoSelezionato.value
                 _primoGiornoSelezionato.value = day
-                isLastLastSelected = false
             }
         } else {
-            if (day.equals(ultimoGiornoSelezionato.value)) {
-                /* nothing */
-            }
-            //se ho già selezionato anche il secondo giorno, se nostituisco uno
-            else if (day.isAfter(ultimoGiornoSelezionato.value)) {
-                _ultimoGiornoSelezionato.value = day
-                isLastLastSelected = true
-            } else if (day.isBefore(primoGiornoSelezionato.value)) {
-                _primoGiornoSelezionato.value = day
-                isLastLastSelected = false
-            } else {
-                if (isLastLastSelected) {
-                    _ultimoGiornoSelezionato.value = day
-                    isLastLastSelected = true
-                } else {
-                    _primoGiornoSelezionato.value = day
-                    isLastLastSelected = false
-                }
-            }
+            //se ho già selezionato entrambi i giornicancello il secondo e riseleziono il primo
+            _ultimoGiornoSelezionato.value = null
+            _primoGiornoSelezionato.value = day
 
         }
 
