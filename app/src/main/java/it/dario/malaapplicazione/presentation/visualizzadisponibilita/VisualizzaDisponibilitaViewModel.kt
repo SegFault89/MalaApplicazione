@@ -25,6 +25,8 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
 
     fun updateFoglioSelezionato(newValue: String) {
         _giornoSelezionato.value = null
+        _primoGiornoSelezionato.value = null
+        _ultimoGiornoSelezionato.value = null
         _loadingFoglio.value = true
         fetchFoglio(newValue)
         _foglioSelezionato.value = newValue
@@ -62,6 +64,62 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
     fun getDisponibilitaGiornaliere(foglio: String, day: LocalDate): DisponibilitaGiornaliere {
         return repository.getDisponibilitaGiornaliere(foglio, day)
     }
+
+    //region range
+    private val _primoGiornoSelezionato: MutableStateFlow<LocalDate?> = MutableStateFlow(null)
+    var primoGiornoSelezionato: StateFlow<LocalDate?> = _primoGiornoSelezionato.asStateFlow()
+
+    private val _ultimoGiornoSelezionato: MutableStateFlow<LocalDate?> = MutableStateFlow(null)
+    var ultimoGiornoSelezionato: StateFlow<LocalDate?> = _ultimoGiornoSelezionato.asStateFlow()
+
+    private var isLastLastSelected = false
+
+    fun selectGiornoForRange(day: LocalDate) {
+        //Se non ho selezionato nessun giorno, setto il primo giorno
+        if (primoGiornoSelezionato.value == null && ultimoGiornoSelezionato.value == null) {
+            _primoGiornoSelezionato.value = day
+            isLastLastSelected = false
+        } else if (primoGiornoSelezionato.value != null && ultimoGiornoSelezionato.value == null) {
+            //se ho già selezionato il primo giorno
+            //se è uguale, faccio niente
+            if (day.equals(primoGiornoSelezionato.value)) {
+                /* nothing */
+            } else if (day.isAfter(primoGiornoSelezionato.value)) {
+                //se è prima, setto il dopo
+                _ultimoGiornoSelezionato.value = day
+                isLastLastSelected = true
+            } else {
+                //se è il dopo, switcho
+                _ultimoGiornoSelezionato.value = primoGiornoSelezionato.value
+                _primoGiornoSelezionato.value = day
+                isLastLastSelected = false
+            }
+        } else {
+            if (day.equals(ultimoGiornoSelezionato.value)) {
+                /* nothing */
+            }
+            //se ho già selezionato anche il secondo giorno, se nostituisco uno
+            else if (day.isAfter(ultimoGiornoSelezionato.value)) {
+                _ultimoGiornoSelezionato.value = day
+                isLastLastSelected = true
+            } else if (day.isBefore(primoGiornoSelezionato.value)) {
+                _primoGiornoSelezionato.value = day
+                isLastLastSelected = false
+            } else {
+                if (isLastLastSelected) {
+                    _ultimoGiornoSelezionato.value = day
+                    isLastLastSelected = true
+                } else {
+                    _primoGiornoSelezionato.value = day
+                    isLastLastSelected = false
+                }
+            }
+
+        }
+
+
+    }
+    //endregion
 }
 
 
