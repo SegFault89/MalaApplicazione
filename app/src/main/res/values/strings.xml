@@ -11,7 +11,7 @@
     <string name="note">Note</string>
     <string name="auto">Auto</string>
     <string name="bambini">Bambini</string>
-    <string name="adulti">Note</string>
+    <string name="adulti">Adulti</string>
     <string name="inserisci_disponibilita_dialog">Inserisci disponibilità</string>
     <string name="confirm">Conferma</string>
     <string name="si">Si</string>
@@ -58,4 +58,14 @@
     <string name="error_aggiorna_foglio">Scegli prima un foglio</string>
     <string name="dal">dal</string>
     <string name="al">al</string>
+    <string name="legenda">Legenda</string>
+    <string name="colors">Colori</string>
+    <string name="disponibile">Disponibile</string>
+    <string name="non_disponibile">Non disponibile</string>
+    <string name="disponibile_riserva">Disponibile con riserva</string>
+    <string name="functions">Funzioni</string>
+    <string name="press">Premi</string>
+    <string name="change_disponibility">Cambia disponibile/non disponibile</string>
+    <string name="long_press">Tieni Premuto</string>
+    <string name="insert_conditional_disponibility">Inserisci disponibilità condizionale</string>
 </resources>
