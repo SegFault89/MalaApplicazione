@@ -44,10 +44,14 @@ val gridItems = listOf(
  */
 @Preview(showBackground = true)
 @Composable
-fun DatiFattura(navigateUp: () -> Unit = {}) {
+fun DatiFattura(
+    navigateUp: () -> Unit = {},
+    openBug: () -> Unit = {}
+) {
     MalaScaffold(
         label = stringResource(id = R.string.dati_fattura),
-        navigateUp = navigateUp
+        navigateUp = navigateUp,
+        openBug = openBug,
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -65,7 +69,9 @@ fun DatiFattura(navigateUp: () -> Unit = {}) {
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier.weight(1f).padding(MarginNormal),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(MarginNormal),
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {

@@ -1,7 +1,6 @@
 package it.dario.malaapplicazione.presentation
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,6 +19,7 @@ import it.dario.malaapplicazione.data.datasources.GoogleSheetDataSource
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.domain.DatasourceErrorHandler
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
+import it.dario.malaapplicazione.presentation.PresentationConstants.BUG_REPORT
 import it.dario.malaapplicazione.presentation.PresentationConstants.DATI_FATTURA
 import it.dario.malaapplicazione.presentation.PresentationConstants.ERROR_DIALOG
 import it.dario.malaapplicazione.presentation.PresentationConstants.ERROR_MESSAGE_ID
@@ -31,6 +31,8 @@ import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModelFactory
+import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportDialog
+import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportViewModel
 import it.dario.malaapplicazione.presentation.sharedcomposable.ErrorDialog
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilita
@@ -70,14 +72,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         CoroutineScope(Dispatchers.IO).launch {
             dataSource.apply {
-                /*setErrorHandler(DatasourceErrorHandler { res: Int ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                    Toast.makeText(
-                        baseContext,
-                        res,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }})*/
                 setup(baseContext)
             }
         }
@@ -115,22 +109,30 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(
                                         DATI_FATTURA
                                     )
-                                }
+                                },
+                                openBug = { navController.navigate(BUG_REPORT) }
                             )
                         }
                         composable(INSERISCI_DISPONIBILITA) {
                             InserisciDisponibilita(
                                 viewModel = inserisciDisponibilitaViewModel,
-                                navigateUp = navController::navigateUp
+                                navigateUp = navController::navigateUp,
+                                openBug = { navController.navigate(BUG_REPORT) }
                             )
                         }
                         composable(VISUALIZZA_DISPONIBILITA) {
                             VisualizzaDisponibilita(
                                 viewModel = visualizzaDisponibilitaViewModel,
-                                navigateUp = navController::navigateUp
+                                navigateUp = navController::navigateUp,
+                                openBug = { navController.navigate(BUG_REPORT) }
                             )
                         }
-                        composable(DATI_FATTURA) { DatiFattura(navigateUp = navController::navigateUp) }
+                        composable(DATI_FATTURA) {
+                            DatiFattura(
+                                navigateUp = navController::navigateUp,
+                                openBug = { navController.navigate(BUG_REPORT) }
+                            )
+                        }
                         dialog(
                             "$ERROR_DIALOG/{$ERROR_MESSAGE_ID}",
                             dialogProperties = DialogProperties(
@@ -140,12 +142,24 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             ErrorDialog(
-                                messageId = it.arguments?.getString(ERROR_MESSAGE_ID)?.toIntOrNull() ?: R.string.generic_error
+                                messageId = it.arguments?.getString(ERROR_MESSAGE_ID)?.toIntOrNull()
+                                    ?: R.string.generic_error
                             )
                         }
-
+                        dialog(
+                            BUG_REPORT,
+                            dialogProperties = DialogProperties(
+                                usePlatformDefaultWidth = true,
+                                dismissOnBackPress = true,
+                                dismissOnClickOutside = false
+                            )
+                        ) {
+                            BugReportDialog(
+                                viewModel = BugReportViewModel(),
+                                dismiss = navController::navigateUp
+                            )
+                        }
                     }
-
                 }
             }
         }

@@ -230,7 +230,8 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
     override suspend fun fetchAnimatoriInFoglio(
         foglio: String,
-        complete: Boolean
+        complete: Boolean,
+        force: Boolean
     ): List<Animatore> {
         //controllo se il foglio esiste già nel malaFIle, altrimento lo scarico e lo aggiungo al file
         val mFoglio =
@@ -239,7 +240,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                 complete
             ).also { malaFile.addFoglio(it) }
 
-        if (complete && LocalDateTime.now().minusMinutes(30).isBefore(mFoglio.dataAggiornamento)) {
+        if (force || (complete && LocalDateTime.now().minusMinutes(10).isBefore(mFoglio.dataAggiornamento))) {
             malaFile.updateFoglio(fetchFoglio(foglio, true))
         }
         return mFoglio.getAnimatoriAsList()

@@ -7,4 +7,6 @@ object Constants {
     const val NO_DISPONIBILITA = ""
     const val NON_DISPONIBILE = "0"
     const val DISPONIBILE = "1"
+
+    const val SUCCESS_RESPONSE = 201
 }

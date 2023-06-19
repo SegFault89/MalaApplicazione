@@ -31,7 +31,8 @@ data class Animatore(
     private var _bambini: Boolean = false,
     private var _adulti: Boolean = false,
     private var _note: String = "",
-    var dataAggiornamento: LocalDateTime = LocalDateTime.now().minusDays(1), //appena un animatore viene creato, lo considero "vecchio" in modo da aggiornalo quando serve
+    var dataAggiornamento: LocalDateTime = LocalDateTime.now()
+        .minusDays(1), //appena un animatore viene creato, lo considero "vecchio" in modo da aggiornalo quando serve
     val id: Int = IdGenerator.getNext
 ) {
 
@@ -47,6 +48,7 @@ data class Animatore(
     private val bambiniFlow = MutableStateFlow(_bambini)
     private val adultiFlow = MutableStateFlow(_adulti)
     private val noteFlow = MutableStateFlow(_note)
+
     /**
      * etichetta che verrà usata per mostrare il nome nello spinner
      */
@@ -76,21 +78,22 @@ data class Animatore(
      * @param date la data da prendere in considerazione
      * @return la disponibilità data dall'animatore, o [NO_DISPONIBILITA] in assenza
      */
-    fun getDisponibilita(date: LocalDate) : String {
+    fun getDisponibilita(date: LocalDate): String {
         return disponibilita[date]?.value ?: NO_DISPONIBILITA
     }
 
-    fun getDisponibilitaAsFlow(date: LocalDate) : StateFlow<String> {
+    fun getDisponibilitaAsFlow(date: LocalDate): StateFlow<String> {
         return disponibilita[date]?.asStateFlow() ?: run {
             disponibilita[date] = MutableStateFlow("")
-            return disponibilita[date]!!.asStateFlow() }
+            return disponibilita[date]!!.asStateFlow()
+        }
     }
 
     fun getDomicilioAsFlow(): StateFlow<String> {
         return domicilioFlow.asStateFlow()
     }
 
-    fun updateDomicilio (value: String) {
+    fun updateDomicilio(value: String) {
         _domicilio = value
         domicilioFlow.value = value
     }
@@ -104,20 +107,20 @@ data class Animatore(
         autoFlow.value = value
     }
 
-    fun getBambiniAsFlow (): StateFlow<Boolean> {
+    fun getBambiniAsFlow(): StateFlow<Boolean> {
         return bambiniFlow.asStateFlow()
     }
 
-    fun updateBambini (value: Boolean) {
+    fun updateBambini(value: Boolean) {
         _bambini = value
         bambiniFlow.value = value
     }
 
-    fun getAdultiAsFlow (): StateFlow<Boolean> {
+    fun getAdultiAsFlow(): StateFlow<Boolean> {
         return adultiFlow.asStateFlow()
     }
 
-    fun updateAdulti (value: Boolean) {
+    fun updateAdulti(value: Boolean) {
         _adulti = value
         adultiFlow.value = value
     }
@@ -126,17 +129,28 @@ data class Animatore(
         return noteFlow.asStateFlow()
     }
 
-    fun updateNote (value: String) {
+    fun updateNote(value: String) {
         _note = value
         noteFlow.value = value
     }
 
-    fun getTipoDisponibilita(date: LocalDate) : DisponibilitaEnum {
+    fun getTipoDisponibilita(date: LocalDate): DisponibilitaEnum {
         return when (getDisponibilita(date)) {
             DISPONIBILE -> DisponibilitaEnum.DISPONIBILE
             NO_DISPONIBILITA,
             NON_DISPONIBILE -> DisponibilitaEnum.NON_DISPONIBILE
+
             else -> DisponibilitaEnum.ALTRO
+        }
+    }
+
+    fun getTipoDisponibilitaInRange(dates: List<LocalDate>): DisponibilitaEnum {
+        return disponibilita.filter { (key, _) -> key in dates }.values.let { map ->
+            when {
+                map.any { it.value == NON_DISPONIBILE || it.value == NO_DISPONIBILITA } -> DisponibilitaEnum.NON_DISPONIBILE
+                map.any { it.value != DISPONIBILE } -> DisponibilitaEnum.ALTRO
+                else -> DisponibilitaEnum.DISPONIBILE
+            }
         }
     }
 
