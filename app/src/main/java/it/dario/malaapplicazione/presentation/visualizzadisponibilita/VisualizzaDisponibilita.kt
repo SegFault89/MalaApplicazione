@@ -1,40 +1,21 @@
 package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.DateRangePickerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SelectableDates
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,17 +27,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
-import it.dario.malaapplicazione.data.Constants
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
-import it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets.MalaCalendario
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaScaffold
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaSpinner
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.Others.spinnerModifier
-import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
-import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.AnimatoreListItem
-import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.GiornoVisualizza
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.VisualizzaDisponibilitaRange
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.VisualizzaDisponibilitaSingolo
 import kotlinx.coroutines.CoroutineScope
@@ -139,7 +115,7 @@ fun Tabs(
     viewModel: VisualizzaDisponibilitaViewModel,
     foglio: String
 ) {
-    var selected by remember { mutableStateOf(0) }
+    var selected by remember { mutableIntStateOf(0) }
     val titles = listOf("Giorno", "Serie di giorni")
     Column {
         TabRow(selectedTabIndex = selected) {
@@ -180,7 +156,7 @@ fun SpinnerSection(
     MalaSpinner(
         modifier = spinnerModifier,
         label = stringResource(id = R.string.seleziona_foglio),
-        options = viewModel.mesi,
+        options = viewModel.getFogli(),
         getOptionLabel = { it },
         selected = foglio,
         onItemSelected = viewModel::updateFoglioSelezionato

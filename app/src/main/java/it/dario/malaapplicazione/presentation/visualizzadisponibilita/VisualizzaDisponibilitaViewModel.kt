@@ -21,7 +21,7 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
     private val _foglioSelezionato: MutableStateFlow<String?> = MutableStateFlow(null)
     var foglioSelezionato: StateFlow<String?> = _foglioSelezionato.asStateFlow()
 
-    val mesi = repository.getFogli()
+    fun getFogli() = repository.getFogli()
 
     fun updateFoglioSelezionato(newValue: String) {
         _giornoSelezionato.value = null
