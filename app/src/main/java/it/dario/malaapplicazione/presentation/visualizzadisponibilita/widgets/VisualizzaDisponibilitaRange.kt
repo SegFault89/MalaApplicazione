@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.domain.utils.rangeTo
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.widgets.MalaCalendario
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
@@ -33,7 +34,6 @@ import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModel
 import java.time.LocalDate
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VisualizzaDisponibilitaRange(
     viewModel: VisualizzaDisponibilitaViewModel,
@@ -52,10 +52,10 @@ fun VisualizzaDisponibilitaRange(
     }
     OutlinedButton(
         onClick = { openDialogStart.value = true },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.padding(top= MarginNormal).fillMaxWidth()
     ) {
         Text(modifier = Modifier.weight(.45f),
-            text = firstDaySelected?.let {firstDaySelected.toString() } ?: "-",
+            text = firstDaySelected?.let {firstDaySelected.toString() } ?: stringResource(id = R.string.dal),
             textAlign = TextAlign.Center)
 
         Text(modifier = Modifier.weight(.1f),
@@ -63,7 +63,7 @@ fun VisualizzaDisponibilitaRange(
             textAlign = TextAlign.Center)
 
         Text(modifier = Modifier.weight(.45f),
-            text = lastDaySelected?.let {lastDaySelected.toString() } ?: "-",
+            text = lastDaySelected?.let {lastDaySelected.toString() } ?: stringResource(id = R.string.al),
             textAlign = TextAlign.Center)
     }
     if (firstDaySelected != null && lastDaySelected != null && !openDialogStart.value) {
