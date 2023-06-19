@@ -1,41 +1,28 @@
 package it.dario.malaapplicazione.presentation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.DialogProperties
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.dialog
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import it.dario.malaapplicazione.BuildConfig
-import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.datasources.GoogleSheetDataSource
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.domain.DatasourceErrorHandler
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
-import it.dario.malaapplicazione.presentation.PresentationConstants.BUG_REPORT
-import it.dario.malaapplicazione.presentation.PresentationConstants.DATI_FATTURA
 import it.dario.malaapplicazione.presentation.PresentationConstants.ERROR_DIALOG
-import it.dario.malaapplicazione.presentation.PresentationConstants.ERROR_MESSAGE_ID
-import it.dario.malaapplicazione.presentation.PresentationConstants.HOME
-import it.dario.malaapplicazione.presentation.PresentationConstants.INSERISCI_DISPONIBILITA
-import it.dario.malaapplicazione.presentation.PresentationConstants.VISUALIZZA_DISPONIBILITA
-import it.dario.malaapplicazione.presentation.datifattura.DatiFattura
-import it.dario.malaapplicazione.presentation.home.Home
-import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModelFactory
-import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportDialog
-import it.dario.malaapplicazione.presentation.bugreportdialog.BugReportViewModel
-import it.dario.malaapplicazione.presentation.sharedcomposable.ErrorDialog
 import it.dario.malaapplicazione.presentation.theme.MalaApplicazioneTheme
-import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilita
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModel
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModelFactory
 import kotlinx.coroutines.CoroutineScope
@@ -75,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 setup(baseContext)
             }
         }
+        askNotificationPermission()
         setContent {
             MalaApplicazioneTheme {
                 // A surface container using the 'background' color from the theme
@@ -91,76 +79,43 @@ class MainActivity : ComponentActivity() {
                         }
                     })
 
-                    NavHost(navController = navController, startDestination = HOME) {
-                        composable(HOME) {
-                            Home(
-                                viewModel = viewModel,
-                                onNavigateToInserisci = {
-                                    navController.navigate(
-                                        INSERISCI_DISPONIBILITA
-                                    )
-                                },
-                                onNavigateToVisualizza = {
-                                    navController.navigate(
-                                        VISUALIZZA_DISPONIBILITA
-                                    )
-                                },
-                                onNavigateToDatiFattura = {
-                                    navController.navigate(
-                                        DATI_FATTURA
-                                    )
-                                },
-                                openBug = { navController.navigate(BUG_REPORT) }
-                            )
-                        }
-                        composable(INSERISCI_DISPONIBILITA) {
-                            InserisciDisponibilita(
-                                viewModel = inserisciDisponibilitaViewModel,
-                                navigateUp = navController::navigateUp,
-                                openBug = { navController.navigate(BUG_REPORT) }
-                            )
-                        }
-                        composable(VISUALIZZA_DISPONIBILITA) {
-                            VisualizzaDisponibilita(
-                                viewModel = visualizzaDisponibilitaViewModel,
-                                navigateUp = navController::navigateUp,
-                                openBug = { navController.navigate(BUG_REPORT) }
-                            )
-                        }
-                        composable(DATI_FATTURA) {
-                            DatiFattura(
-                                navigateUp = navController::navigateUp,
-                                openBug = { navController.navigate(BUG_REPORT) }
-                            )
-                        }
-                        dialog(
-                            "$ERROR_DIALOG/{$ERROR_MESSAGE_ID}",
-                            dialogProperties = DialogProperties(
-                                usePlatformDefaultWidth = false,
-                                dismissOnBackPress = true,
-                                dismissOnClickOutside = true
-                            )
-                        ) {
-                            ErrorDialog(
-                                messageId = it.arguments?.getString(ERROR_MESSAGE_ID)?.toIntOrNull()
-                                    ?: R.string.generic_error
-                            )
-                        }
-                        dialog(
-                            BUG_REPORT,
-                            dialogProperties = DialogProperties(
-                                usePlatformDefaultWidth = true,
-                                dismissOnBackPress = true,
-                                dismissOnClickOutside = false
-                            )
-                        ) {
-                            BugReportDialog(
-                                viewModel = BugReportViewModel(),
-                                dismiss = navController::navigateUp
-                            )
-                        }
-                    }
+                    MalaNavHost(
+                        navController = navController,
+                        viewModel = viewModel,
+                        inserisciDisponibilitaViewModel = inserisciDisponibilitaViewModel,
+                        visualizzaDisponibilitaViewModel = visualizzaDisponibilitaViewModel
+                    )
+
                 }
+            }
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            // TODO: Inform user that that your app will not show notifications.
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                // TODO: display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }

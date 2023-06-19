@@ -28,7 +28,7 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     private val _animatoreSelezionato: MutableStateFlow<String?> = MutableStateFlow(null)
     var animatoreSelezionato: StateFlow<String?> = _animatoreSelezionato.asStateFlow()
 
-    val mesi = repository.getFogli()
+    fun getFogli() = repository.getFogli()
     var listAnimatori = listOf<Animatore>()
 
 
