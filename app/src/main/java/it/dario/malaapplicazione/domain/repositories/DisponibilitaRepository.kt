@@ -7,6 +7,7 @@ import it.dario.malaapplicazione.data.enums.DisponibilitaEnum
 import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.data.model.Foglio
+import it.dario.malaapplicazione.domain.utils.rangeTo
 import java.time.LocalDate
 
 class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
@@ -95,6 +96,14 @@ class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
             .filter { it.getTipoDisponibilita(day) != DisponibilitaEnum.NON_DISPONIBILE }
             .toList()
             .sortedByDescending { it.getTipoDisponibilita(day).ordinal }.toList() //TODO rendere un po' più preciso
+    }
+
+    fun getAnimatoriDisponibiliRange(foglio: String, giorni: List<LocalDate>):  List<Animatore> {
+        return datasource.getFoglio(foglio).animatori.values
+            .filter {
+                it.getTipoDisponibilitaInRange(giorni) != DisponibilitaEnum.NON_DISPONIBILE }
+            .toList()
+            .sortedByDescending { it.getTipoDisponibilitaInRange(giorni).ordinal }.toList() //TODO rendere un po' più preciso
     }
 
 

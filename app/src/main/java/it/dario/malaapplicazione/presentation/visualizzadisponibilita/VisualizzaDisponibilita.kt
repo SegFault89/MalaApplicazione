@@ -3,26 +3,47 @@ package it.dario.malaapplicazione.presentation.visualizzadisponibilita
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DateRangePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AndroidUiDispatcher.Companion.Main
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.Constants
@@ -36,6 +57,8 @@ import it.dario.malaapplicazione.presentation.theme.Others.spinnerModifier
 import it.dario.malaapplicazione.presentation.theme.VerticalSpacingNormal
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.AnimatoreListItem
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.GiornoVisualizza
+import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.VisualizzaDisponibilitaRange
+import it.dario.malaapplicazione.presentation.visualizzadisponibilita.widgets.VisualizzaDisponibilitaSingolo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -55,8 +78,24 @@ fun VisualizzaDisponibilita(
         additionalAction = listOf {
             RefreshButton {
                 viewModel.refreshSheet(
-                    onComplete = { CoroutineScope(Main).launch { Toast.makeText(context, R.string.foglio_aggiornato, Toast.LENGTH_LONG).show()} },
-                    onError =  { CoroutineScope(Main).launch { Toast.makeText(context, R.string.error_aggiorna_foglio, Toast.LENGTH_LONG).show()} }
+                    onComplete = {
+                        CoroutineScope(Main).launch {
+                            Toast.makeText(
+                                context,
+                                R.string.foglio_aggiornato,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    },
+                    onError = {
+                        CoroutineScope(Main).launch {
+                            Toast.makeText(
+                                context,
+                                R.string.error_aggiorna_foglio,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 )
             }
         },
@@ -87,10 +126,46 @@ fun Content(
         )
 
         if (currentFoglio != null) {
-            DisponibilitaData(
+            Tabs(
                 viewModel = viewModel,
                 foglio = currentFoglio!!,
             )
+        }
+    }
+}
+
+@Composable
+fun Tabs(
+    viewModel: VisualizzaDisponibilitaViewModel,
+    foglio: String
+) {
+    var selected by remember { mutableStateOf(0) }
+    val titles = listOf("Giorno", "Serie di giorni")
+    Column {
+        TabRow(selectedTabIndex = selected) {
+            titles.forEachIndexed { index, title ->
+                Tab(
+                    selected = selected == index,
+                    onClick = { selected = index },
+                    text = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                )
+            }
+        }
+
+        val foglioIsLoading by viewModel.loadingFoglio.collectAsState()
+
+        if (foglioIsLoading) {
+            //se sto caricando
+            Box(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        } else {
+            when (selected) {
+                0 -> VisualizzaDisponibilitaSingolo(viewModel = viewModel, foglio = foglio)
+                1 -> VisualizzaDisponibilitaRange(viewModel = viewModel, foglio = foglio)
+            }
         }
     }
 }
@@ -111,67 +186,6 @@ fun SpinnerSection(
         onItemSelected = viewModel::updateFoglioSelezionato
     )
 }
-
-
-@Composable
-fun DisponibilitaData(
-    viewModel: VisualizzaDisponibilitaViewModel,
-    foglio: String,
-) {
-
-    Log.d(Constants.TAG, "composing DisponibilitaData")
-    val foglioIsLoading by viewModel.loadingFoglio.collectAsState()
-
-    if (foglioIsLoading) {
-        //se sto caricando
-        CircularProgressIndicator()
-    } else {
-        //Se ho caricato
-        MalaCalendario(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = VerticalSpacingNormal),
-            startDate = viewModel.getPrimoGiorno(foglio),
-            endDate = viewModel.getUltimoGiorno(foglio),
-            dayContent = {
-                GiornoVisualizza(
-                    viewModel = viewModel,
-                    day = it,
-                    foglio = foglio,
-                )
-            }
-        )
-
-        AnimatoriList(viewModel = viewModel, foglio)
-    }
-}
-
-@Composable
-fun AnimatoriList(
-    viewModel: VisualizzaDisponibilitaViewModel,
-    foglioSelezionato: String
-) {
-    val giornoSelezionato by viewModel.giornoSelezionato.collectAsState()
-
-
-    giornoSelezionato?.let { giorno ->
-        val lst = viewModel.getAnimatoriDisponibili(foglioSelezionato, giorno).toList()
-
-        LazyColumn(
-            modifier = Modifier.padding(MarginNormal),
-            verticalArrangement = Arrangement.spacedBy(VerticalSpacingNormal),
-            state = LazyListState(0)
-        ) {
-            items(lst, key = { (it.id * 100) + giorno.dayOfMonth }) {
-                AnimatoreListItem(
-                    animatore = it,
-                    giornoSelezionato = giorno
-                )
-            }
-        }
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable
@@ -200,5 +214,3 @@ fun RefreshButton(
         )
     }
 }
-
-
