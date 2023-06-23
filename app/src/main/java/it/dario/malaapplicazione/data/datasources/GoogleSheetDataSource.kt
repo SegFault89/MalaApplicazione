@@ -96,7 +96,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                 .execute().sheets.map { it.properties.title }.filter { FILENAME_REGEX.matches(it) }
                 .toList()
         } catch (t: Throwable) {
-            errorHandler?.onGetFogliError(t)
+            errorHandler?.onGetFogliError(t) ?: t.printStackTrace()
             listOf()
         }
 
@@ -106,7 +106,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         service.spreadsheets()
             .values()[GOOLE_SPREADSHEET, "$foglio!$COLONNE_NOME_COGNOME_ANIMATORI"].execute()
     } catch (t: Throwable) {
-        errorHandler?.onGetAnimatoriError(t)
+        errorHandler?.onGetAnimatoriError(t) ?: t.printStackTrace()
         ValueRange()
     }
 
@@ -135,7 +135,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
             service.spreadsheets()
                 .values()[GOOLE_SPREADSHEET, "$foglio!${getRigheAnimatoriCoompleti(indiceNote = noteIndex)}"].execute()
         } catch (t: Throwable) {
-            errorHandler?.onGetAnimatoriCompleteError(t)
+            errorHandler?.onGetAnimatoriCompleteError(t) ?: t.printStackTrace()
             ValueRange()
         }
 
@@ -186,7 +186,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     private fun getGiorni(foglio: String) = try {
         service.spreadsheets().values()[GOOLE_SPREADSHEET, "$foglio!$RIGA_GIORNI"].execute()
     } catch (t: Throwable) {
-        errorHandler?.onGetGiorniError(t)
+        errorHandler?.onGetGiorniError(t) ?: t.printStackTrace()
         ValueRange()
     }
 
@@ -250,9 +250,9 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     private fun getAnimatoreCompleto(foglio: String, rowIndex: Int) = try {
         service.spreadsheets()
             .values()[GOOLE_SPREADSHEET, "$foglio!$INDICE_COLONNA_RESIDENZA$rowIndex:$rowIndex"].execute()
-            .getValues().first()
+            .getValues()?.first()
     } catch (t: Throwable) {
-        errorHandler?.onGetAnimatoreError(t)
+        errorHandler?.onGetAnimatoreError(t) ?: t.printStackTrace()
         listOf()
     }
 
@@ -271,7 +271,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
         val line = getAnimatoreCompleto(foglio, rowIndex)
 
-        line.forEachIndexed { i, v ->
+        line?.forEachIndexed { i, v ->
             when (i) {
                 0 -> toUpdate.updateDomicilio(v.toString())
                 1 -> toUpdate.updateAuto(v.toString() == "1")
@@ -323,7 +323,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                 .setValueInputOption(RAW)
                 .execute()
         } catch (t: Throwable) {
-            errorHandler?.onUpdateCellError(t)
+            errorHandler?.onUpdateCellError(t) ?: t.printStackTrace()
         }
     }
 
