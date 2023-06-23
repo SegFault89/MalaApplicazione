@@ -7,10 +7,11 @@ import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-
 class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
 
 
@@ -32,16 +33,16 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     var listAnimatori = listOf<Animatore>()
 
 
-    fun updateFoglioSelezionato(newValue: String) {
-        fetchAnimatoriInFoglio(newValue)
+    fun updateFoglioSelezionato(newValue: String?) {
+        newValue?.let { fetchAnimatoriInFoglio(it) }
         _foglioSelezionato.value = newValue
         _animatoreSelezionato.value = null
     }
 
-    fun updateAnimatoreSelezionato(newValue: String) {
+    fun updateAnimatoreSelezionato(newValue: String?) {
         _loadingAnimatore.value = true
         viewModelScope.launch(IO) {
-            repository.refreshAnimatore(foglioSelezionato.value!!, newValue)
+            newValue?.let { repository.refreshAnimatore(foglioSelezionato.value!!, it) }
             _loadingAnimatore.value = false
         }
         _animatoreSelezionato.value = newValue

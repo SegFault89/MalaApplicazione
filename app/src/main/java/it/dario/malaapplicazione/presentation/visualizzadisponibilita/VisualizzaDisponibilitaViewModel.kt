@@ -6,7 +6,9 @@ import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -23,12 +25,12 @@ class VisualizzaDisponibilitaViewModel(val repository: DisponibilitaRepository) 
 
     fun getFogli() = repository.getFogli()
 
-    fun updateFoglioSelezionato(newValue: String) {
+    fun updateFoglioSelezionato(newValue: String?) {
         _giornoSelezionato.value = null
         _primoGiornoSelezionato.value = null
         _ultimoGiornoSelezionato.value = null
         _loadingFoglio.value = true
-        fetchFoglio(newValue)
+        newValue?.let { fetchFoglio(it) }
         _foglioSelezionato.value = newValue
     }
 
