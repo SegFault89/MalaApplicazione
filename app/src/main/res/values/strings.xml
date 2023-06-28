@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">MalaApplicazione</string>
+
     <string name="inserisci_disponibilita">Inserisci Disponibilità</string>
     <string name="visualizza_disponibilita">Visualizza Disponibilità</string>
     <string name="dati_fattura">Dati Fattura</string>
+    <string name="links">Collegamenti Utili</string>
+
     <string name="indietro">indietro</string>
     <string name="seleziona_foglio">Seleziona il foglio</string>
     <string name="seleziona_animatore">Seleziona l\'animatore</string>
@@ -68,4 +71,6 @@
     <string name="change_disponibility">Cambia disponibile/non disponibile</string>
     <string name="long_press">Tieni Premuto</string>
     <string name="insert_conditional_disponibility">Inserisci disponibilità condizionale</string>
+    <string name="links_description">Varie ed eventuali</string>
+
 </resources>

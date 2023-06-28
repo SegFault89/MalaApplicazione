@@ -13,6 +13,7 @@ import it.dario.malaapplicazione.presentation.datifattura.DatiFattura
 import it.dario.malaapplicazione.presentation.home.Home
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilita
 import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDisponibilitaViewModel
+import it.dario.malaapplicazione.presentation.links.LinkUtili
 import it.dario.malaapplicazione.presentation.sharedcomposable.ErrorDialog
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilita
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModel
@@ -23,27 +24,13 @@ fun MalaNavHost(
     viewModel: MalaViewModel,
     inserisciDisponibilitaViewModel: InserisciDisponibilitaViewModel,
     visualizzaDisponibilitaViewModel: VisualizzaDisponibilitaViewModel
+
 ) {
     NavHost(navController = navController, startDestination = PresentationConstants.HOME) {
         composable(PresentationConstants.HOME) {
             Home(
                 viewModel = viewModel,
-                onNavigateToInserisci = {
-                    navController.navigate(
-                        PresentationConstants.INSERISCI_DISPONIBILITA
-                    )
-                },
-                onNavigateToVisualizza = {
-                    navController.navigate(
-                        PresentationConstants.VISUALIZZA_DISPONIBILITA
-                    )
-                },
-                onNavigateToDatiFattura = {
-                    navController.navigate(
-                        PresentationConstants.DATI_FATTURA
-                    )
-                },
-                openBug = { navController.navigate(PresentationConstants.BUG_REPORT) }
+                navController = navController
             )
         }
         composable(PresentationConstants.INSERISCI_DISPONIBILITA) {
@@ -62,6 +49,12 @@ fun MalaNavHost(
         }
         composable(PresentationConstants.DATI_FATTURA) {
             DatiFattura(
+                navigateUp = navController::navigateUp,
+                openBug = { navController.navigate(PresentationConstants.BUG_REPORT) }
+            )
+        }
+        composable(PresentationConstants.LINKS) {
+            LinkUtili(
                 navigateUp = navController::navigateUp,
                 openBug = { navController.navigate(PresentationConstants.BUG_REPORT) }
             )

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import it.dario.malaapplicazione.presentation.theme.HomeButtonHeight
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.Typography
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,7 @@ fun HomeButton(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(HomeButtonHeight),
         elevation = CardDefaults.cardElevation(5.dp),
         shape = MaterialTheme.shapes.medium,
         enabled = state,
