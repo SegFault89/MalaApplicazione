@@ -16,40 +16,38 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import it.dario.malaapplicazione.BuildConfig
 import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.MalaViewModel
+import it.dario.malaapplicazione.presentation.PresentationConstants
 import it.dario.malaapplicazione.presentation.home.widgets.HomeButton
 import it.dario.malaapplicazione.presentation.sharedcomposable.BugReportIcon
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaProgressIndicator
 import it.dario.malaapplicazione.presentation.theme.MarginBig
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.MarginSmall
+import it.dario.malaapplicazione.presentation.theme.VerticalSpacingBig
 
 /**
  * Pagina iniziale dell'app
  *
  * @param viewModel ViewModel per la schermata
- * @param onNavigateToInserisci funzione per navigare verso la pagina InserisciDisponibilita
- * @param onNavigateToVisualizza funzione per navigare verso la pagina VisualizzaDisponibilita
- * @param onNavigateToDatiFattura funzione per navigare verso la pagina DatiFattura
- * @param openBug funzione per navigare verso il dialog di apertura segnalazioni
+ * @param navController navigation controller
  *
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     viewModel: MalaViewModel,
-    onNavigateToInserisci: () -> Unit = {},
-    onNavigateToVisualizza: () -> Unit = {},
-    onNavigateToDatiFattura: () -> Unit = {},
-    openBug: () -> Unit = {}
+    navController: NavController
 ) {
     Scaffold(
         topBar = {
@@ -58,7 +56,7 @@ fun Home(
                     Text(text = stringResource(id = R.string.app_name))
                 },
                 actions = {
-                    BugReportIcon(openBug)
+                    BugReportIcon { navController.navigate(PresentationConstants.BUG_REPORT) }
                 }
             )
         }) { contentPadding ->
@@ -78,19 +76,17 @@ fun Home(
 
                 Buttons(
                     modifier = Modifier
-                        .fillMaxSize()
                         .constrainAs(buttons) {
                             top.linkTo(parent.top)
                             bottom.linkTo(footer.top)
                         },
                     viewModel = viewModel,
-                    onNavigateToDatiFattura = onNavigateToDatiFattura,
-                    onNavigateToInserisci = onNavigateToInserisci,
-                    onNavigateToVisualizza = onNavigateToVisualizza
+                    navController = navController
                 )
                 //Footer
                 Footer(modifier = Modifier.constrainAs(footer){
                     bottom.linkTo(parent.bottom)
+                    top.linkTo(buttons.bottom)
                 })
             }
         }
@@ -101,15 +97,13 @@ fun Home(
 fun Buttons(
     modifier: Modifier = Modifier,
     viewModel: MalaViewModel,
-    onNavigateToInserisci: () -> Unit = {},
-    onNavigateToVisualizza: () -> Unit = {},
-    onNavigateToDatiFattura: () -> Unit = {},
+    navController: NavController
 ) {
     val buttonModifier = Modifier.fillMaxWidth()
     LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Fixed(1),
-        verticalArrangement = Arrangement.SpaceEvenly,
+        verticalArrangement = Arrangement.spacedBy(VerticalSpacingBig),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         item {
@@ -117,7 +111,7 @@ fun Buttons(
                 modifier = buttonModifier,
                 label = stringResource(id = R.string.inserisci_disponibilita),
                 description = stringResource(id = R.string.inserisci_disponibilita_description),
-                onclick = onNavigateToInserisci,
+                onclick = { navController.navigate(PresentationConstants.INSERISCI_DISPONIBILITA) },
                 enabled = viewModel.isReady
             )
         }
@@ -126,7 +120,7 @@ fun Buttons(
                 modifier = buttonModifier,
                 label = stringResource(id = R.string.visualizza_disponibilita),
                 description = stringResource(id = R.string.visualizza_disponibilita_description),
-                onclick = onNavigateToVisualizza,
+                onclick = { navController.navigate(PresentationConstants.VISUALIZZA_DISPONIBILITA) },
                 enabled = viewModel.isReady
             )
         }
@@ -135,7 +129,16 @@ fun Buttons(
                 modifier = buttonModifier,
                 label = stringResource(id = R.string.dati_fattura),
                 description = stringResource(id = R.string.dati_fattura_description),
-                onclick = onNavigateToDatiFattura
+
+                onclick = { navController.navigate(PresentationConstants.DATI_FATTURA) }
+            )
+        }
+        item {
+            HomeButton(
+                modifier = buttonModifier,
+                label = stringResource(id = R.string.links),
+                description = stringResource(id = R.string.links_description),
+                onclick = { navController.navigate(PresentationConstants.LINKS) }
             )
         }
     }
@@ -173,5 +176,5 @@ fun Footer(modifier: Modifier) {
 @Preview(showSystemUi = true, device = "spec:width=300dp,height=841dp,dpi=480")
 @Composable
 fun Preview() {
-    Home(viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())))
+    Home(viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())), navController = NavController(context = LocalContext.current))
 }

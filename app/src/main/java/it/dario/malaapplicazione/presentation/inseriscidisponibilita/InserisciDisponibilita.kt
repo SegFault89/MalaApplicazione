@@ -109,7 +109,7 @@ fun SpinnerSection(
     MalaSpinner(
         modifier = spinnerModifier,
         label = stringResource(id = R.string.seleziona_foglio),
-        options = viewModel.mesi,
+        options = viewModel.getFogli(),
         getOptionLabel = { it },
         selected = foglio,
         onItemSelected = viewModel::updateFoglioSelezionato
@@ -127,8 +127,9 @@ fun SpinnerSection(
                 label = stringResource(id = R.string.seleziona_animatore),
                 options = viewModel.listAnimatori,
                 getOptionLabel = { a -> a.label },
-                onItemSelected = { viewModel.updateAnimatoreSelezionato(it.label) },
-                selected = animatore
+                onItemSelected = { viewModel.updateAnimatoreSelezionato(it?.label) },
+                selected = animatore,
+                searchable = true
             )
         }
     }
