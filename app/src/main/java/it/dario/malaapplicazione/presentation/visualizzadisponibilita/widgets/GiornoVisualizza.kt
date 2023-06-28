@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -101,6 +102,8 @@ fun NumeriDisponibilita(disponibilitaGiornaliere: DisponibilitaGiornaliere) {
             modifier = Modifier
                 .background(DisponibileGreen, shape = CircleShape)
                 .padding(1.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
     if (disponibilitaGiornaliere.altro > 0) {
@@ -112,6 +115,8 @@ fun NumeriDisponibilita(disponibilitaGiornaliere: DisponibilitaGiornaliere) {
             modifier = Modifier
                 .background(DisponibileYellow, shape = CircleShape)
                 .padding(1.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
     if (disponibilitaGiornaliere.nonDisponibili > 0) {
@@ -123,6 +128,8 @@ fun NumeriDisponibilita(disponibilitaGiornaliere: DisponibilitaGiornaliere) {
             modifier = Modifier
                 .background(DisponibileRed, shape = CircleShape)
                 .padding(1.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
