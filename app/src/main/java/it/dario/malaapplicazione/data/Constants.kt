@@ -11,4 +11,6 @@ object Constants {
     const val SUCCESS_RESPONSE = 201
 
     const val FIREBASE_URL = "https://malapplicazione-default-rtdb.europe-west1.firebasedatabase.app/"
+    const val FIREBASE_LINKS = "links"
+
 }

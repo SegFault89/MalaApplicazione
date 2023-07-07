@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -13,8 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import it.dario.malaapplicazione.R
-import it.dario.malaapplicazione.presentation.links.widgets.LinkButton
-import it.dario.malaapplicazione.presentation.links.widgets.LinkHeader
+import it.dario.malaapplicazione.presentation.links.widgets.LinkSectionWidget
 import it.dario.malaapplicazione.presentation.sharedcomposable.MalaScaffold
 import it.dario.malaapplicazione.presentation.theme.MarginBig
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
@@ -48,11 +46,7 @@ fun LinkUtili(
         ) {
             links?.sortedBy { it.order }?.forEach { section ->
 
-                item {  LinkHeader(text = section.sezione) }
-                items (section.elementi.sortedBy { it.order }) { link ->
-                    LinkButton(link = link)
-                }
-
+                item {  LinkSectionWidget(section = section) }
             }
         }
     }

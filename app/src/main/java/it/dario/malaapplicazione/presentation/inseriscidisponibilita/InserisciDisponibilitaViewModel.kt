@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) : ViewModel() {
 
@@ -33,10 +34,16 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     var listAnimatori = listOf<Animatore>()
 
 
-    fun updateFoglioSelezionato(newValue: String?) {
-        newValue?.let { fetchAnimatoriInFoglio(it) }
+    fun updateFoglioSelezionato(newValue: String?) = runBlocking {
         _foglioSelezionato.value = newValue
-        _animatoreSelezionato.value = null
+        newValue?.let { fetchAnimatoriInFoglio(it) }
+
+        //se nel nuovo foglio selezionato ho già l'animatore selezionato, lo refressho
+        if ((animatoreSelezionato.value != null && listAnimatori.any { it.label == animatoreSelezionato.value })) {
+            updateAnimatoreSelezionato(_animatoreSelezionato.value)
+        } else {
+            _animatoreSelezionato.value = null
+        }
     }
 
     fun updateAnimatoreSelezionato(newValue: String?) {
@@ -49,7 +56,7 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     }
 
 
-    private fun fetchAnimatoriInFoglio(foglio: String) = CoroutineScope(IO).launch {
+    private suspend fun fetchAnimatoriInFoglio(foglio: String) {
         _loadingFoglio.value = true
         listAnimatori = repository.fetchAnimatori(foglio).sortedBy { it.label }
         _loadingFoglio.value = false

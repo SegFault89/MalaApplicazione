@@ -51,15 +51,17 @@ fun VisualizzaDisponibilitaSingolo(
 
     AnimatedVisibility(visible = showDate, modifier = Modifier.fillMaxWidth()) {
         giornoSelezionato?.let { day ->
-        OutlinedButton(
-            onClick = { coroutineScope.launch { lazyListState.animateScrollToItem(0) }},
-            modifier = Modifier.padding(top= MarginNormal).fillMaxWidth()
-        ) {
-
+            OutlinedButton(
+                onClick = { coroutineScope.launch { lazyListState.animateScrollToItem(0) } },
+                modifier = Modifier
+                    .padding(top = MarginNormal)
+                    .fillMaxWidth()
+            ) {
                 Text(
                     //text = SimpleDateFormat("EE dd MMMM", Locale.current).format(giornoSelezionato),
                     text = day.format(DateTimeFormatter.ofPattern("EEEE dd MMMM")),
-                    textAlign = TextAlign.Center)
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

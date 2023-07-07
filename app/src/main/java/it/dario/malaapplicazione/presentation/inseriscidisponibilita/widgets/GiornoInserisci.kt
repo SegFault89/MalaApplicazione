@@ -29,6 +29,7 @@ import it.dario.malaapplicazione.presentation.inseriscidisponibilita.InserisciDi
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
 import it.dario.malaapplicazione.presentation.theme.DisponibileRed
 import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
+import it.dario.malaapplicazione.presentation.theme.TextOverColor
 import java.time.LocalDate
 
 /**
@@ -91,7 +92,8 @@ fun GiornoInserisci(
             Text(
                 text = day.dayOfMonth.toString(),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                color = TextOverColor
             )
         }
     }

@@ -42,6 +42,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -232,7 +233,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         foglio: String,
         complete: Boolean,
         force: Boolean
-    ): List<Animatore> {
+    ): List<Animatore> = runBlocking(IO){
         //controllo se il foglio esiste già nel malaFIle, altrimento lo scarico e lo aggiungo al file
         val mFoglio =
             malaFile.malaFogli[foglio] ?: fetchFoglio(
@@ -243,8 +244,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
         if (force || (complete && LocalDateTime.now().minusMinutes(10).isBefore(mFoglio.dataAggiornamento))) {
             malaFile.updateFoglio(fetchFoglio(foglio, true))
         }
-        return mFoglio.getAnimatoriAsList()
-
+        return@runBlocking mFoglio.getAnimatoriAsList()
     }
 
     private fun getAnimatoreCompleto(foglio: String, rowIndex: Int) = try {

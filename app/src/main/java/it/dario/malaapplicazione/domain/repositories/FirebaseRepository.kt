@@ -4,6 +4,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import it.dario.malaapplicazione.data.Constants.FIREBASE_LINKS
 import it.dario.malaapplicazione.data.Constants.FIREBASE_URL
 import it.dario.malaapplicazione.data.model.LinkSection
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,10 +12,10 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
 
-class FirebaseRepository(
+class FirebaseRepository {
+
     private val firebaseDatabase: FirebaseDatabase =
-        FirebaseDatabase.getInstance(FIREBASE_URL),
-) {
+        FirebaseDatabase.getInstance(FIREBASE_URL)
 
     @ExperimentalCoroutinesApi
     fun fetchLinks() = callbackFlow<Result<List<LinkSection>>> {
@@ -31,11 +32,12 @@ class FirebaseRepository(
                 this@callbackFlow.trySendBlocking(Result.success(items.filterNotNull()))
             }
         }
-        firebaseDatabase.getReference("links")
+
+        firebaseDatabase.getReference(FIREBASE_LINKS)
             .addValueEventListener(postListener)
 
         awaitClose {
-            firebaseDatabase.getReference("links")
+            firebaseDatabase.getReference(FIREBASE_LINKS)
                 .removeEventListener(postListener)
         }
     }
