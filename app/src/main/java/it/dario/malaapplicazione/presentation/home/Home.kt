@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import it.dario.malaapplicazione.BuildConfig
 import it.dario.malaapplicazione.R
@@ -34,7 +34,7 @@ import it.dario.malaapplicazione.presentation.sharedcomposable.MalaProgressIndic
 import it.dario.malaapplicazione.presentation.theme.MarginBig
 import it.dario.malaapplicazione.presentation.theme.MarginNormal
 import it.dario.malaapplicazione.presentation.theme.MarginSmall
-import it.dario.malaapplicazione.presentation.theme.VerticalSpacingBig
+import it.dario.malaapplicazione.presentation.theme.VerticalSpacingSmall
 
 /**
  * Pagina iniziale dell'app
@@ -62,32 +62,23 @@ fun Home(
         }) { contentPadding ->
         Box(
             modifier = Modifier
-                .padding(contentPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(contentPadding),
         ) {
             //Indicatore di caricamento
             MalaProgressIndicator(Modifier.align(Alignment.TopEnd), viewModel.isReady)
-            ConstraintLayout (
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(MarginBig),
+                    .padding(start = MarginBig, end = MarginBig, top = 0.dp, bottom = MarginSmall)
             ) {
-                val (buttons, footer) = createRefs()
-
                 Buttons(
-                    modifier = Modifier
-                        .constrainAs(buttons) {
-                            top.linkTo(parent.top)
-                            bottom.linkTo(footer.top)
-                        },
+                    modifier = Modifier.weight(1f),
                     viewModel = viewModel,
                     navController = navController
                 )
-                //Footer
-                Footer(modifier = Modifier.constrainAs(footer){
-                    bottom.linkTo(parent.bottom)
-                    top.linkTo(buttons.bottom)
-                })
+                Footer()
+
             }
         }
     }
@@ -101,9 +92,9 @@ fun Buttons(
 ) {
     val buttonModifier = Modifier.fillMaxWidth()
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = modifier.padding(top = MarginSmall, bottom = MarginSmall),
         columns = GridCells.Fixed(1),
-        verticalArrangement = Arrangement.spacedBy(VerticalSpacingBig),
+        verticalArrangement = Arrangement.spacedBy(VerticalSpacingSmall),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         item {
@@ -145,7 +136,7 @@ fun Buttons(
 }
 
 @Composable
-fun Footer(modifier: Modifier) {
+fun Footer(modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         //Avviso versione di test
         Text(
@@ -154,7 +145,8 @@ fun Footer(modifier: Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    bottom = MarginNormal,
+                    top = 0.dp,
+                    bottom = MarginSmall,
                     start = MarginNormal,
                     end = MarginNormal
                 )
@@ -176,5 +168,8 @@ fun Footer(modifier: Modifier) {
 @Preview(showSystemUi = true, device = "spec:width=300dp,height=841dp,dpi=480")
 @Composable
 fun Preview() {
-    Home(viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())), navController = NavController(context = LocalContext.current))
+    Home(
+        viewModel = MalaViewModel(DisponibilitaRepository(MockDataSource())),
+        navController = NavController(context = LocalContext.current)
+    )
 }
