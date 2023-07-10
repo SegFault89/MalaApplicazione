@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,7 +30,6 @@ import it.dario.malaapplicazione.data.datasources.MockDataSource
 import it.dario.malaapplicazione.data.model.DisponibilitaGiornaliere
 import it.dario.malaapplicazione.domain.repositories.DisponibilitaRepository
 import it.dario.malaapplicazione.presentation.theme.DisponibileGreen
-import it.dario.malaapplicazione.presentation.theme.DisponibileRed
 import it.dario.malaapplicazione.presentation.theme.DisponibileYellow
 import it.dario.malaapplicazione.presentation.theme.TextOverColor
 import it.dario.malaapplicazione.presentation.visualizzadisponibilita.VisualizzaDisponibilitaViewModel
@@ -49,43 +48,35 @@ fun GiornoVisualizza(
     val daySelected by viewModel.giornoSelezionato.collectAsState()
 
     val disponibilitaGiornaliere = viewModel.getDisponibilitaGiornaliere(foglio, day)
-    Box(
+    Card(
+        onClick = { viewModel.updateSelectedDay(day) },
         modifier = Modifier
+            .padding(2.dp)
+            .fillMaxSize()
             .aspectRatio(1f),
-        contentAlignment = Alignment.Center
+        colors = CardDefaults.cardColors(
+            containerColor = if (daySelected == day) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            },
+        )
     ) {
-        Card(
-            onClick = { viewModel.updateSelectedDay(day) },
+        Text(
             modifier = Modifier
-                .padding(2.dp)
-                .fillMaxSize(),
-            colors = CardDefaults.cardColors(
-                containerColor = if (daySelected == day) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                },
-            )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                //contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = day.dayOfMonth.toString(),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                .weight(.5f)
+                .fillMaxWidth(),
+            text = day.dayOfMonth.toString(),
+            textAlign = TextAlign.Center,
+        )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    NumeriDisponibilita(disponibilitaGiornaliere)
-                }
-            }
+        Row(
+            modifier = Modifier
+                .weight(.5f)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            NumeriDisponibilita(disponibilitaGiornaliere)
         }
     }
 }
@@ -94,43 +85,41 @@ fun GiornoVisualizza(
 @Composable
 fun NumeriDisponibilita(disponibilitaGiornaliere: DisponibilitaGiornaliere) {
     if (disponibilitaGiornaliere.disponibili > 0) {
-        Text(
-            text = disponibilitaGiornaliere.disponibili.toString(),
-            textAlign = TextAlign.Center,
-            fontSize = 10.sp,
-            color = TextOverColor,
+        Box(
             modifier = Modifier
+                .padding(1.dp)
                 .background(DisponibileGreen, shape = CircleShape)
-                .padding(1.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+                .aspectRatio(1f)
+                .wrapContentSize()
         )
+        {
+            Text(
+                text = disponibilitaGiornaliere.disponibili.toString(),
+                textAlign = TextAlign.Center,
+                fontSize = 10.sp,
+                color = TextOverColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
     if (disponibilitaGiornaliere.altro > 0) {
-        Text(
-            text = disponibilitaGiornaliere.altro.toString(),
-            textAlign = TextAlign.Center,
-            fontSize = 10.sp,
-            color = TextOverColor,
+        Box(
             modifier = Modifier
+                .padding(1.dp)
                 .background(DisponibileYellow, shape = CircleShape)
-                .padding(1.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-    if (disponibilitaGiornaliere.nonDisponibili > 0) {
-        Text(
-            text = disponibilitaGiornaliere.nonDisponibili.toString(),
-            textAlign = TextAlign.Center,
-            color = TextOverColor,
-            fontSize = 10.sp,
-            modifier = Modifier
-                .background(DisponibileRed, shape = CircleShape)
-                .padding(1.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+                .aspectRatio(1f)
+                .wrapContentSize()
+        ) {
+            Text(
+                text = disponibilitaGiornaliere.altro.toString(),
+                textAlign = TextAlign.Center,
+                fontSize = 10.sp,
+                color = TextOverColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -144,9 +133,9 @@ fun PreviewGiornoVisualizza() {
                 mock
             )
         ).apply {
-            updateFoglioSelezionato(mock.foglioNovembre.label)
+            updateFoglioSelezionato(mock.foglioOttobre.label)
         },
-        day = mock.foglioNovembre.primoGiorno,
-        foglio = mock.foglioNovembre.label,
+        day = mock.foglioOttobre.primoGiorno,
+        foglio = mock.foglioOttobre.label,
     )
 }
