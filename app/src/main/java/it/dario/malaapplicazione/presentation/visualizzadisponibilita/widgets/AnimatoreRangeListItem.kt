@@ -90,32 +90,6 @@ fun AnimatoreRangeListItem(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
-
-                    Text(
-                        buildAnnotatedString {
-                            append(stringResource(id = R.string.bambini))
-                            append(": ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(id = if (animatore.bambini) R.string.si else R.string.no))
-                            }
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-
-                    Text(
-                        buildAnnotatedString {
-                            append(stringResource(id = R.string.adulti))
-                            append(": ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(id = if (animatore.adulti) R.string.si else R.string.no))
-                            }
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
-
-
                 }
 
                 Spacer(modifier = Modifier.height(VerticalSpacingSmall))

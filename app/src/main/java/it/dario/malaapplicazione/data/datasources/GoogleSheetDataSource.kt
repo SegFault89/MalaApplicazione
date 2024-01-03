@@ -14,16 +14,11 @@ import it.dario.malaapplicazione.R
 import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import it.dario.malaapplicazione.data.Constants.TAG
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.BASE_YEAR
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.COLONNE_NOME_COGNOME_ANIMATORI
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.FILENAME_REGEX
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.FILE_NAME_SEPARATOR
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_ADULTI
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_ADULTI_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_AUTO
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_AUTO_INT
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_BAMBINI
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_BAMBINI_INT
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_COGNOME_INT
+import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_NOME
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_NOME_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_PRIMO_GIORNO_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_RESIDENZA
@@ -105,7 +100,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
     private fun getRangeNomiCognomiAnimatori(foglio: String): ValueRange = try {
         service.spreadsheets()
-            .values()[GOOLE_SPREADSHEET, "$foglio!$COLONNE_NOME_COGNOME_ANIMATORI"].execute()
+            .values()[GOOLE_SPREADSHEET, "$foglio!$INDICE_COLONNA_NOME"].execute()
     } catch (t: Throwable) {
         errorHandler?.onGetAnimatoriError(t) ?: t.printStackTrace()
         ValueRange()
@@ -121,7 +116,6 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                     Animatore(
                         index = i,
                         nome = v[0].toString(),
-                        cognome = v[1].toString(),
                     )
                 )
             } catch (t: Throwable) {
@@ -152,13 +146,8 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                 anim = Animatore(
                     index = i,
                     nome = v[INDICE_COLONNA_NOME_INT - 1].toString(),
-                    cognome = v[INDICE_COLONNA_COGNOME_INT - 1].toString(),
                     _domicilio = v[INDICE_COLONNA_RESIDENZA_INT - 1]?.toString() ?: "",
                     _auto = v[INDICE_COLONNA_AUTO_INT - 1]?.let { it.toString() == "1" } ?: false,
-                    _adulti = v[INDICE_COLONNA_ADULTI_INT - 1]?.let { it.toString() == "1" }
-                        ?: false,
-                    _bambini = v[INDICE_COLONNA_BAMBINI_INT - 1]?.let { it.toString() == "1" }
-                        ?: false,
                     _note = if (v.size == indiceNote - 1) {
                         ""
                     } else {
@@ -275,8 +264,6 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
             when (i) {
                 0 -> toUpdate.updateDomicilio(v.toString())
                 1 -> toUpdate.updateAuto(v.toString() == "1")
-                2 -> toUpdate.updateAdulti(v.toString() == "1")
-                3 -> toUpdate.updateBambini(v.toString() == "1")
                 noteIndex -> toUpdate.updateNote(v.toString())
                 else -> toUpdate.setDisponibilita(
                     sheet.primoGiorno.plusDays(i - 4L),
@@ -302,14 +289,6 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
     override fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
         return getAnimatore(foglio, animatore).getAutoAsFlow()
-    }
-
-    override fun getBambiniAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-        return getAnimatore(foglio, animatore).getBambiniAsFlow()
-    }
-
-    override fun getAdultiAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-        return getAnimatore(foglio, animatore).getAdultiAsFlow()
     }
 
     override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
@@ -347,26 +326,6 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
             if (value) "1" else "0"
         )
         anim.updateAuto(value)
-    }
-
-    override suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) {
-        val anim = getAnimatore(foglio, animatore)
-        updateGoogleCell(
-            foglio,
-            "$INDICE_COLONNA_BAMBINI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-            if (value) "1" else "0"
-        )
-        anim.updateBambini(value)
-    }
-
-    override suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
-        val anim = getAnimatore(foglio, animatore)
-        updateGoogleCell(
-            foglio,
-            "$INDICE_COLONNA_ADULTI${INDICE_RIGA_PRIMO_ANIMATORE + anim.index}",
-            if (value) "1" else "0"
-        )
-        anim.updateAdulti(value)
     }
 
     override suspend fun updateNote(foglio: String, animatore: String, value: String) {

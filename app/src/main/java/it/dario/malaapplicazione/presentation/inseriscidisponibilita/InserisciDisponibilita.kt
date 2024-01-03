@@ -183,18 +183,6 @@ fun AnimatoreData(
             label = stringResource(id = R.string.auto),
             onCheckedChanged = { viewModel.updateAuto(foglio, animatore, it) }
         )
-
-        LabeledCheckbox(
-            label = stringResource(id = R.string.adulti),
-            onCheckedChanged = { viewModel.updateAdulti(foglio, animatore, it) },
-            toObserve = viewModel.getAdultiAsFlow(foglio, animatore)
-        )
-
-        LabeledCheckbox(
-            label = stringResource(id = R.string.bambini),
-            onCheckedChanged = { viewModel.updateBambini(foglio, animatore, it) },
-            toObserve = viewModel.getBambiniAsFlow(foglio, animatore)
-        )
     }
 }
 

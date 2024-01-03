@@ -98,17 +98,6 @@ class InserisciDisponibilitaViewModel(val repository: DisponibilitaRepository) :
     fun updateAuto(foglio: String, animatore: String, value: Boolean) =
         CoroutineScope(IO).launch { repository.updateAuto(foglio, animatore, value) }
 
-    fun getBambiniAsFlow(foglio: String, animatore: String) =
-        repository.getBambiniAsFlow(foglio, animatore)
-
-    fun updateBambini(foglio: String, animatore: String, value: Boolean) =
-        CoroutineScope(IO).launch { repository.updateBambini(foglio, animatore, value) }
-
-    fun getAdultiAsFlow(foglio: String, animatore: String) =
-        repository.getAdultiAsFlow(foglio, animatore)
-
-    fun updateAdulti(foglio: String, animatore: String, value: Boolean) =
-        CoroutineScope(IO).launch { repository.updateAdulti(foglio, animatore, value) }
 }
 
 @Suppress("UNCHECKED_CAST")

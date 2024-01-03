@@ -8,23 +8,14 @@ object GoogleSheetConstants {
     const val INDICE_RIGA_GIORNI = 2
 
     const val INDICE_COLONNA_NOME = 'A'
-    const val INDICE_COLONNA_COGNOME = 'B'
-    const val INDICE_COLONNA_PRIMO_GIORNO = 'G'
-    const val INDICE_COLONNA_RESIDENZA = 'C'
-    const val INDICE_COLONNA_AUTO = 'D'
-    const val INDICE_COLONNA_ADULTI = 'E'
-    const val INDICE_COLONNA_BAMBINI = 'F'
+    const val INDICE_COLONNA_PRIMO_GIORNO = 'D'
+    const val INDICE_COLONNA_RESIDENZA = 'B'
+    const val INDICE_COLONNA_AUTO = 'C'
 
     const val INDICE_COLONNA_NOME_INT = 1
-    const val INDICE_COLONNA_COGNOME_INT = 2
-    const val INDICE_COLONNA_RESIDENZA_INT = 3
-    const val INDICE_COLONNA_AUTO_INT = 4
-    const val INDICE_COLONNA_ADULTI_INT = 5
-    const val INDICE_COLONNA_BAMBINI_INT = 6
-    const val INDICE_COLONNA_PRIMO_GIORNO_INT = 7
-
-    const val COLONNE_NOME_COGNOME_ANIMATORI =
-        "$INDICE_COLONNA_NOME$INDICE_RIGA_PRIMO_ANIMATORE:$INDICE_COLONNA_COGNOME"
+    const val INDICE_COLONNA_RESIDENZA_INT = 2
+    const val INDICE_COLONNA_AUTO_INT = 3
+    const val INDICE_COLONNA_PRIMO_GIORNO_INT = 4
 
     fun getRigheAnimatoriCoompleti (indiceNote: Int): String =
         "R${INDICE_RIGA_PRIMO_ANIMATORE}C$INDICE_COLONNA_NOME_INT:C$indiceNote"

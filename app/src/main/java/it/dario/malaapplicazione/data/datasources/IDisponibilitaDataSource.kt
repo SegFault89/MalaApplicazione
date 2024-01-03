@@ -31,15 +31,11 @@ sealed interface IDisponibilitaDataSource {
 
     fun getDomicilioAsFlow(foglio: String, animatore: String): StateFlow<String>
     fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean>
-    fun getBambiniAsFlow (foglio: String, animatore: String): StateFlow<Boolean>
-    fun getAdultiAsFlow (foglio: String, animatore: String): StateFlow<Boolean>
     fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String>
 
     suspend fun updateDisponibilita(foglio: String, animatore: String, date: LocalDate, content: String)
     suspend fun updateDomicilio (foglio: String, animatore: String, value: String)
     suspend fun updateAuto(foglio: String, animatore: String, value: Boolean)
-    suspend fun updateBambini (foglio: String, animatore: String, value: Boolean)
-    suspend fun updateAdulti (foglio: String, animatore: String, value: Boolean)
     suspend fun updateNote (foglio: String, animatore: String, value: String)
 
     suspend fun refreshAnimatore(foglio: String, animatore: String)

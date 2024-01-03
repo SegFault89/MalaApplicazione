@@ -49,43 +49,31 @@ class MockDataSource : IDisponibilitaDataSource {
 
     val darioOttobre = Animatore(
         index = 1,
-        nome = "Dario",
-        cognome = "Trisconi",
+        nome = "Dario Trisconi",
         _domicilio = "Seregno",
         _auto = false,
-        _adulti = true,
-        _bambini = false,
         _note = "Datemidabbere"
     )
     val darioNovembre = Animatore(
         index = 1,
-        nome = "Dario",
-        cognome = "Trisconi",
+        nome = "Dario Trisconi",
         _domicilio = "Seregno",
         _auto = false,
-        _adulti = true,
-        _bambini = false,
         _note = "Datemidabberedippiù"
     )
 
     val silviaOttobre = Animatore(
         index = 2,
-        nome = "Silvia",
-        cognome = "Ratti",
+        nome = "Silvia Ratti",
         _domicilio = "Seregno",
         _auto = true,
-        _adulti = true,
-        _bambini = true,
         _note = "Mai più ad Ancona"
     )
     val silviaNovembre = Animatore(
         index = 2,
-        nome = "Silvia",
-        cognome = "Ratti",
+        nome = "Silvia Ratti",
         _domicilio = "Seregno",
         _auto = true,
-        _adulti = true,
-        _bambini = true,
         _note = "Avevo detto mai più :("
     )
 
@@ -138,14 +126,6 @@ class MockDataSource : IDisponibilitaDataSource {
         return getAnimatore(foglio, animatore).getAutoAsFlow()
     }
 
-    override fun getBambiniAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-        return getAnimatore(foglio, animatore).getBambiniAsFlow()
-    }
-
-    override fun getAdultiAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
-        return getAnimatore(foglio, animatore).getAdultiAsFlow()
-    }
-
     override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
         return getAnimatore(foglio, animatore).getNoteAsFlow()
     }
@@ -156,14 +136,6 @@ class MockDataSource : IDisponibilitaDataSource {
 
     override suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) {
         getAnimatore(foglio, animatore).updateAuto(value)
-    }
-
-    override suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) {
-        getAnimatore(foglio, animatore).updateBambini(value)
-    }
-
-    override suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) {
-        getAnimatore(foglio, animatore).updateAdulti(value)
     }
 
     override suspend fun updateNote(foglio: String, animatore: String, value: String) {

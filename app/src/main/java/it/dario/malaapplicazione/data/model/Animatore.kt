@@ -25,11 +25,8 @@ import java.time.LocalDateTime
 data class Animatore(
     val index: Int,
     val nome: String,
-    val cognome: String,
     private var _domicilio: String = "",
     private var _auto: Boolean = false,
-    private var _bambini: Boolean = false,
-    private var _adulti: Boolean = false,
     private var _note: String = "",
     var dataAggiornamento: LocalDateTime = LocalDateTime.now()
         .minusDays(1), //appena un animatore viene creato, lo considero "vecchio" in modo da aggiornalo quando serve
@@ -40,19 +37,16 @@ data class Animatore(
     val domicilio: String get() = _domicilio
     val note: String get() = _note
     val auto: Boolean get() = _auto
-    val adulti: Boolean get() = _adulti
-    val bambini: Boolean get() = _bambini
 
     private val domicilioFlow = MutableStateFlow(_domicilio)
     private val autoFlow = MutableStateFlow(_auto)
-    private val bambiniFlow = MutableStateFlow(_bambini)
-    private val adultiFlow = MutableStateFlow(_adulti)
     private val noteFlow = MutableStateFlow(_note)
 
     /**
      * etichetta che verrà usata per mostrare il nome nello spinner
+     * prima era "cognome nome", ora la tengo solo per eventuali modifiche future
      */
-    val label: String get() = "$cognome $nome"
+    val label: String get() = "$nome"
 
     /**
      * la disponibilità data dall'animatore per il giorno indicato come chiave
@@ -60,7 +54,6 @@ data class Animatore(
     private val disponibilita: MutableMap<LocalDate, MutableStateFlow<String>> = mutableMapOf()
 
     fun setDisponibilita(date: LocalDate, content: String) {
-        //disponibilita[date] = MutableStateFlow(content)
         if (disponibilita[date] == null) {
             disponibilita[date] = MutableStateFlow(content)
         } else {
@@ -105,24 +98,6 @@ data class Animatore(
     fun updateAuto(value: Boolean) {
         _auto = value
         autoFlow.value = value
-    }
-
-    fun getBambiniAsFlow(): StateFlow<Boolean> {
-        return bambiniFlow.asStateFlow()
-    }
-
-    fun updateBambini(value: Boolean) {
-        _bambini = value
-        bambiniFlow.value = value
-    }
-
-    fun getAdultiAsFlow(): StateFlow<Boolean> {
-        return adultiFlow.asStateFlow()
-    }
-
-    fun updateAdulti(value: Boolean) {
-        _adulti = value
-        adultiFlow.value = value
     }
 
     fun getNoteAsFlow(): StateFlow<String> {

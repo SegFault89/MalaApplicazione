@@ -48,12 +48,6 @@ class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
     fun getNoteAsFlow(foglio: String, animatore: String) =
         datasource.getNoteAsFlow(foglio = foglio, animatore = animatore)
 
-    fun getBambiniAsFlow(foglio: String, animatore: String) =
-        datasource.getBambiniAsFlow(foglio = foglio, animatore = animatore)
-
-    fun getAdultiAsFlow(foglio: String, animatore: String) =
-        datasource.getAdultiAsFlow(foglio = foglio, animatore = animatore)
-
     fun getAutoAsFlow(foglio: String, animatore: String) =
         datasource.getAutoAsFlow(foglio = foglio, animatore = animatore)
 
@@ -62,12 +56,6 @@ class DisponibilitaRepository(val datasource: IDisponibilitaDataSource) {
 
     suspend fun updateAuto(foglio: String, animatore: String, value: Boolean) =
         datasource.updateAuto(foglio, animatore, value)
-
-    suspend fun updateBambini(foglio: String, animatore: String, value: Boolean) =
-        datasource.updateBambini(foglio, animatore, value)
-
-    suspend fun updateAdulti(foglio: String, animatore: String, value: Boolean) =
-        datasource.updateAdulti(foglio, animatore, value)
 
     suspend fun updateNote(foglio: String, animatore: String, value: String) =
         datasource.updateNote(foglio, animatore, value)
