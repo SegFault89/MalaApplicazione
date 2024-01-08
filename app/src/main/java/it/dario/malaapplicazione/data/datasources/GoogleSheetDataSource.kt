@@ -15,18 +15,18 @@ import it.dario.malaapplicazione.data.Constants.NO_DISPONIBILITA
 import it.dario.malaapplicazione.data.Constants.TAG
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.BASE_YEAR
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.FILENAME_REGEX
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.FILE_NAME_SEPARATOR
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_AUTO
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_AUTO_INT
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_NOME
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_NOME_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_PRIMO_GIORNO_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_RESIDENZA
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_COLONNA_RESIDENZA_INT
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.INDICE_RIGA_PRIMO_ANIMATORE
+import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.OFFSET_PRIMO_GIORNO_SENZA_NOMI
+import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.RANGE_NOMI
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.RAW
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.RIGA_GIORNI
-import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.getRigheAnimatoriCoompleti
+import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.getRigheAnimatoriCompleti
 import it.dario.malaapplicazione.data.datasources.GoogleSheetConstants.mapMonth
 import it.dario.malaapplicazione.data.model.Animatore
 import it.dario.malaapplicazione.data.model.Foglio
@@ -100,7 +100,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
     private fun getRangeNomiCognomiAnimatori(foglio: String): ValueRange = try {
         service.spreadsheets()
-            .values()[GOOLE_SPREADSHEET, "$foglio!$INDICE_COLONNA_NOME"].execute()
+            .values()[GOOLE_SPREADSHEET, "$foglio!$RANGE_NOMI"].execute()
     } catch (t: Throwable) {
         errorHandler?.onGetAnimatoriError(t) ?: t.printStackTrace()
         ValueRange()
@@ -128,7 +128,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     private fun getRangeNomiCognomiAnimatoriComplete(foglio: String, noteIndex: Int): ValueRange =
         try {
             service.spreadsheets()
-                .values()[GOOLE_SPREADSHEET, "$foglio!${getRigheAnimatoriCoompleti(indiceNote = noteIndex)}"].execute()
+                .values()[GOOLE_SPREADSHEET, "$foglio!${getRigheAnimatoriCompleti(indiceNote = noteIndex)}"].execute()
         } catch (t: Throwable) {
             errorHandler?.onGetAnimatoriCompleteError(t) ?: t.printStackTrace()
             ValueRange()
@@ -186,20 +186,19 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
 
         Log.d(TAG, "Numero giorni = ${(giorniNelFoglio.getValues().first().size)}")
 
-        val splitted = name.split(FILE_NAME_SEPARATOR)
-
+        val year = BASE_YEAR + name.trim().takeLast(2).toInt()
         val first = giorniNelFoglio.getValues().first().first().toString().split(" ")
         val last = giorniNelFoglio.getValues().first().last().toString().split(" ")
 
         val primoGiorno =
             LocalDate.of(
-                BASE_YEAR + splitted[1].toInt(),
+                year,
                 mapMonth[first[1].lowercase().trim()]!!,
                 first[0].toInt()
             )
         val ultimoGiorno =
             LocalDate.of(
-                BASE_YEAR + splitted[1].toInt(),
+                year,
                 mapMonth[last[1].lowercase().trim()]!!,
                 last[0].toInt()
             )
@@ -256,7 +255,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
             return
         }
         val rowIndex = INDICE_RIGA_PRIMO_ANIMATORE + toUpdate.index
-        val noteIndex = (sheet.dayNum + 4).toInt()
+        val noteIndex = (sheet.dayNum + OFFSET_PRIMO_GIORNO_SENZA_NOMI).toInt()
 
         val line = getAnimatoreCompleto(foglio, rowIndex)
 
@@ -266,7 +265,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
                 1 -> toUpdate.updateAuto(v.toString() == "1")
                 noteIndex -> toUpdate.updateNote(v.toString())
                 else -> toUpdate.setDisponibilita(
-                    sheet.primoGiorno.plusDays(i - 4L),
+                    sheet.primoGiorno.plusDays(i - OFFSET_PRIMO_GIORNO_SENZA_NOMI.toLong()),
                     v.toString()
                 )
             }
@@ -290,6 +289,7 @@ object GoogleSheetDataSource : IDisponibilitaDataSource {
     override fun getAutoAsFlow(foglio: String, animatore: String): StateFlow<Boolean> {
         return getAnimatore(foglio, animatore).getAutoAsFlow()
     }
+
 
     override fun getNoteAsFlow(foglio: String, animatore: String): StateFlow<String> {
         return getAnimatore(foglio, animatore).getNoteAsFlow()

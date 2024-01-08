@@ -6,6 +6,7 @@ object GoogleSheetConstants {
 
     const val INDICE_RIGA_PRIMO_ANIMATORE = 4 //evitando Mario Rossi
     const val INDICE_RIGA_GIORNI = 2
+    const val OFFSET_PRIMO_GIORNO_SENZA_NOMI = 2 //quante celle, senza prendere in considerazione quelle del nome, ci sono prima del primo giorno
 
     const val INDICE_COLONNA_NOME = 'A'
     const val INDICE_COLONNA_PRIMO_GIORNO = 'D'
@@ -17,14 +18,14 @@ object GoogleSheetConstants {
     const val INDICE_COLONNA_AUTO_INT = 3
     const val INDICE_COLONNA_PRIMO_GIORNO_INT = 4
 
-    fun getRigheAnimatoriCoompleti (indiceNote: Int): String =
+    fun getRigheAnimatoriCompleti (indiceNote: Int): String =
         "R${INDICE_RIGA_PRIMO_ANIMATORE}C$INDICE_COLONNA_NOME_INT:C$indiceNote"
 
     const val RIGA_GIORNI = "$INDICE_COLONNA_PRIMO_GIORNO$INDICE_RIGA_GIORNI:$INDICE_RIGA_GIORNI"
+    const val RANGE_NOMI = "$INDICE_COLONNA_NOME$INDICE_RIGA_PRIMO_ANIMATORE:$INDICE_COLONNA_NOME"
 
-    const val FILE_NAME_SEPARATOR = "'"
 
-    const val FILENAME_PATTERN = """^.*'\d{2}$"""
+    const val FILENAME_PATTERN = """^.*\d{2}$""" // vecchio pattern con ' """^.*'\d{2}$"""
     val FILENAME_REGEX = Regex(FILENAME_PATTERN)
 
     const val BASE_YEAR = 2000
