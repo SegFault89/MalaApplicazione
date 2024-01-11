@@ -9,7 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class LinkUtiliViewModel(private val repository: FirebaseRepository = FirebaseRepository()
+class LinkUtiliViewModel(private val repository: FirebaseRepository = FirebaseRepository
 ) : ViewModel() {
 
     init {

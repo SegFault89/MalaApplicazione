@@ -79,14 +79,10 @@ fun MalaCalendario(
             }
         }
 
-        //iteminserted = 6
         /* gestione di tutte le altre righe*/
         for (rowId in 0 until rows) {
-            val firstIndex = rowId * columns
-
             Row {
                 for (columnId in 0 until columns) {
-                    val index = firstIndex + columnId
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
